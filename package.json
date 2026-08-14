@@ -1,6 +1,6 @@
 {
   "name": "vscode-claude-statusline",
-  "displayName": "Claude Statusline",
+  "displayName": "Claude Simple Stats Bar",
   "description": "Editor stats and live Claude Code session usage (model, tokens, cost, context %, multi-session and history) in the VS Code status bar.",
   "version": "0.3.0",
   "publisher": "rcanpahali",
@@ -20,19 +20,19 @@
     "commands": [
       {
         "command": "claudeStatusline.refresh",
-        "title": "Claude Statusline: Refresh"
+        "title": "Claude Simple Stats Bar: Refresh"
       },
       {
         "command": "claudeStatusline.openPanel",
-        "title": "Claude Statusline: Open Session Panel"
+        "title": "Claude Simple Stats Bar: Open Session Panel"
       },
       {
         "command": "claudeStatusline.switchPrimarySession",
-        "title": "Claude Statusline: Switch Primary Session"
+        "title": "Claude Simple Stats Bar: Switch Primary Session"
       }
     ],
     "configuration": {
-      "title": "Claude Statusline",
+      "title": "Claude Simple Stats Bar",
       "properties": {
         "claudeStatusline.enabled": {
           "type": "boolean",

@@ -1,4 +1,4 @@
-# Claude Statusline (VS Code)
+# Claude Simple Stats Bar (VS Code)
 
 Your Claude Code session's model, token usage, context left, and running cost — live in the VS Code status bar.
 
@@ -6,7 +6,7 @@ Your Claude Code session's model, token usage, context left, and running cost �
 
 ## What it does
 
-Claude Statusline adds a Claude segment to the far right of your status bar: current model, total tokens, context used, and estimated cost, all updating live as your session's transcript grows. Click it (or run **Claude Statusline: Open Session Panel**) to open a full panel with your other sessions, recent spend, and compaction history.
+Claude Simple Stats Bar adds a Claude segment to the far right of your status bar: current model, total tokens, context used, and estimated cost, all updating live as your session's transcript grows. Click it (or run **Claude Simple Stats Bar: Open Session Panel**) to open a full panel with your other sessions, recent spend, and compaction history.
 
 It's built so you can see where a session stands — and what it's costing — without breaking flow to check a terminal or a dashboard.
 
@@ -27,11 +27,11 @@ Hover over the Claude segment for the full token breakdown — input, output, ca
 
 ## Session panel
 
-Click the Claude segment (or run **Claude Statusline: Open Session Panel**) to open a panel beside your editor:
+Click the Claude segment (or run **Claude Simple Stats Bar: Open Session Panel**) to open a panel beside your editor:
 
 ![Session panel showing sessions in this workspace, a compaction note, a 7-day spend chart, and spend by model](docs/images/panel-anatomy.png)
 
-1. **Sessions in this workspace** — every Claude Code transcript found here, with the "primary" one (the one the status bar tracks) marked. Running more than one session at once? Use **Make primary** or the **Claude Statusline: Switch Primary Session** command to pick a different one.
+1. **Sessions in this workspace** — every Claude Code transcript found here, with the "primary" one (the one the status bar tracks) marked. Running more than one session at once? Use **Make primary** or the **Claude Simple Stats Bar: Switch Primary Session** command to pick a different one.
 2. **Last 7 days** — a spend chart and per-model breakdown for this workspace, stored locally and auto-pruned past 7 days.
 3. **Compaction** — a heuristic count of likely compaction events for the primary session, since context % only reflects the last turn. Best-effort, not exact (see [details](#how-compaction-detection-works)).
 
@@ -49,9 +49,9 @@ Click the Claude segment (or run **Claude Statusline: Open Session Panel**) to o
 
 | Command | What it does |
 |---|---|
-| `Claude Statusline: Refresh` | Force a re-read of the current transcript. |
-| `Claude Statusline: Open Session Panel` | Open the webview panel (also bound to clicking the Claude segment). |
-| `Claude Statusline: Switch Primary Session` | Pick which concurrent session in this workspace is tracked as primary. |
+| `Claude Simple Stats Bar: Refresh` | Force a re-read of the current transcript. |
+| `Claude Simple Stats Bar: Open Session Panel` | Open the webview panel (also bound to clicking the Claude segment). |
+| `Claude Simple Stats Bar: Switch Primary Session` | Pick which concurrent session in this workspace is tracked as primary. |
 
 ## Install
 
@@ -87,7 +87,7 @@ There is no public API for Claude Code session telemetry. This extension reads t
 
 It scans every folder in your (possibly multi-root) workspace for a matching transcript directory, then auto-picks the most recently modified `.jsonl` file across all of them as the "primary" session, re-parsing it on file changes plus a periodic poll as a fallback. This is reverse-engineered from observed behavior, not a documented contract — if Claude Code changes its storage format, update `src/claudeSession/transcriptLocator.ts` and `src/claudeSession/transcriptParser.ts` to match.
 
-If multiple sessions are running concurrently in the workspace, auto-pick can grab the wrong one — use the session panel's "Make primary" button, the **Claude Statusline: Switch Primary Session** command, or pin an exact file with `claudeStatusline.sessionFile` (which always wins over both).
+If multiple sessions are running concurrently in the workspace, auto-pick can grab the wrong one — use the session panel's "Make primary" button, the **Claude Simple Stats Bar: Switch Primary Session** command, or pin an exact file with `claudeStatusline.sessionFile` (which always wins over both).
 </details>
 
 <details>
