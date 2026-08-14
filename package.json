@@ -1,0 +1,65 @@
+{
+  "name": "vscode-claude-statusline",
+  "displayName": "Claude Statusline",
+  "description": "Editor stats and live Claude Code session usage (model, tokens, cost, context %) in the VS Code status bar.",
+  "version": "0.2.0",
+  "publisher": "local",
+  "private": true,
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "claudeStatusline.refresh",
+        "title": "Claude Statusline: Refresh"
+      },
+      {
+        "command": "claudeStatusline.showSessionDetails",
+        "title": "Claude Statusline: Show Session Details"
+      }
+    ],
+    "configuration": {
+      "title": "Claude Statusline",
+      "properties": {
+        "claudeStatusline.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Claude Code session status bar item."
+        },
+        "claudeStatusline.pollIntervalMs": {
+          "type": "number",
+          "default": 2000,
+          "description": "How often to re-check the transcript file in addition to the file watcher, in milliseconds."
+        },
+        "claudeStatusline.contextWindowTokens": {
+          "type": "number",
+          "default": 200000,
+          "description": "Context window size (in tokens) used to estimate the context-usage percentage shown in the status bar."
+        },
+        "claudeStatusline.sessionFile": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to a specific Claude Code .jsonl transcript to track. Leave empty to auto-detect the most recently modified session for the current workspace under ~/.claude/projects/."
+        },
+        "claudeStatusline.pricing": {
+          "type": "object",
+          "default": {},
+          "description": "USD price per 1,000,000 tokens, keyed by model id, e.g. { \"claude-sonnet-5\": { \"inputPerMillion\": 3, \"outputPerMillion\": 15, \"cacheWritePerMillion\": 3.75, \"cacheReadPerMillion\": 0.3 } }. No defaults are shipped — verify current Anthropic pricing before configuring, since the extension does not fetch or guess rates. Without an entry for a model, cost shows as n/a."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -w -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.0"
+  }
+}
