@@ -13,6 +13,26 @@ function formatTokenCount(n: number): string {
   return `${n}`;
 }
 
+const CONTEXT_BAR_WIDTH = 6;
+
+function formatContextBar(pct: number, width = CONTEXT_BAR_WIDTH): string {
+  const clamped = Math.max(0, Math.min(100, pct));
+  const filled = Math.round((clamped / 100) * width);
+  return "▮".repeat(filled) + "▯".repeat(width - filled);
+}
+
+interface ContextSeverity {
+  icon: string;
+  tag: string;
+}
+
+function contextSeverity(pct: number): ContextSeverity {
+  if (pct >= 90) return { icon: "$(flame)", tag: "CRIT" };
+  if (pct >= 70) return { icon: "$(warning)", tag: "WARN" };
+  if (pct >= 50) return { icon: "$(graph-line)", tag: "MED" };
+  return { icon: "$(hubot)", tag: "CALM" };
+}
+
 export class ClaudeSessionStatusBar implements vscode.Disposable {
   private readonly item: vscode.StatusBarItem;
   private readonly sessionManager = new SessionManager();
@@ -118,15 +138,14 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
 
     const cost = estimateCostUsd(usage, this.pricing);
     const costLabel = cost === undefined ? "n/a" : `$${cost.toFixed(3)}`;
-    const statusIcon =
-      contextPct >= 90 ? "$(flame)" : contextPct >= 70 ? "$(warning)" : "$(hubot)";
+    const severity = contextSeverity(contextPct);
 
     this.item.text =
-      `${statusIcon} ${usage.model ?? "claude"} · ` +
+      `${severity.icon} ${usage.model ?? "claude"} · ` +
       `$(pulse) ${formatTokenCount(totalTokens)} tok · ` +
-      `$(dashboard) ${contextPct}% ctx · ` +
+      `$(dashboard) ${severity.tag} ${formatContextBar(contextPct)}  ${contextPct}% ctx · ` +
       `$(credit-card) ${costLabel}`;
-    this.item.tooltip = this.buildTooltip(usage, contextPct, costLabel);
+    this.item.tooltip = this.buildTooltip(usage, contextPct, costLabel, severity);
 
     this.updateSessionsAndHistory(primary);
   }
@@ -162,7 +181,8 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
   private buildTooltip(
     usage: UsageTotals,
     contextPct: number,
-    costLabel: string
+    costLabel: string,
+    severity: ContextSeverity
   ): vscode.MarkdownString {
     const md = new vscode.MarkdownString();
     md.supportThemeIcons = true;
@@ -172,7 +192,9 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
     md.appendMarkdown(`- $(arrow-up) Output tokens: ${usage.outputTokens.toLocaleString()}\n`);
     md.appendMarkdown(`- $(save) Cache write: ${usage.cacheCreationTokens.toLocaleString()}\n`);
     md.appendMarkdown(`- $(history) Cache read: ${usage.cacheReadTokens.toLocaleString()}\n`);
-    md.appendMarkdown(`- $(dashboard) Context used (last turn): ~${contextPct}%\n`);
+    md.appendMarkdown(
+      `- $(dashboard) Context used (last turn): ${severity.tag} ${formatContextBar(contextPct)}  ~${contextPct}%\n`
+    );
     if (usage.compactionCount > 0) {
       md.appendMarkdown(
         `- $(refresh) Compacted ~${usage.compactionCount}x this session (heuristic)\n`

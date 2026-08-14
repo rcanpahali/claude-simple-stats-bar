@@ -1,39 +1,45 @@
 # Claude Simple Stats Bar (VS Code)
 
-Your Claude Code session's model, token usage, context left, and running cost — live in the VS Code status bar.
+Live Claude Code session stats — model, tokens, context left, cost — in the VS Code status bar.
 
 ![Status bar showing the Claude segment at the right edge of the window](docs/images/statusbar-hero.png)
 
-## What it does
+## Features
 
-Claude Simple Stats Bar adds a Claude segment to the far right of your status bar: current model, total tokens, context used, and estimated cost, all updating live as your session's transcript grows. Click it (or run **Claude Simple Stats Bar: Open Session Panel**) to open a full panel with your other sessions, recent spend, and compaction history.
+- Status bar segment with current model, total tokens, context used, and estimated cost, updating live as the transcript grows.
+- Context usage shown as a 6-segment fill bar with a `CALM`/`MED`/`WARN`/`CRIT` tag, plus a matching model icon: neutral below 50%, a small graph at ≥50%, a warning triangle at ≥70%, a flame at ≥90%.
+- Hover tooltip with the full token breakdown (input / output / cache write / cache read) and the transcript path being tracked.
+- Session panel with every session in the workspace, a 7-day spend chart, per-model spend, and a compaction count.
+- Multi-session support — auto-detects every Claude Code transcript in the workspace, with a switchable primary.
+- Configurable per-model pricing, adjustable poll interval, and a pinnable transcript path.
 
-It's built so you can see where a session stands — and what it's costing — without breaking flow to check a terminal or a dashboard.
+## Requirements
+
+- VS Code 1.90 or newer.
+- The Claude Code CLI, writing transcripts locally under `~/.claude/projects/`. This extension has no other data source — see [Where the data comes from](#where-the-data-comes-from).
 
 ## Claude segment, explained
 
-![Anatomy of the Claude segment: model, total tokens, context used, estimated cost, and the three warning-icon states](docs/images/statusbar-anatomy.png)
+![Anatomy of the Claude segment: model, total tokens, context used, estimated cost, and the four severity-tag states](docs/images/statusbar-anatomy.png)
 
-- **Model** — the icon doubles as a context-usage warning light: it stays neutral below 70%, switches to a warning triangle at ≥70%, and a flame at ≥90%.
+- **Model** icon — neutral, small graph, warning, or flame depending on context-usage tier (see Features above).
 - **Total tokens** — input + output + cache for the whole session.
-- **Context used** — based on the *last turn only*, not a running total — it answers "will my next message fit," not "how much have I used overall."
-- **Estimated cost** — built-in pricing covers the current Sonnet/Opus/Haiku/Fable models out of the box; see [Cost estimates](#cost-estimates) to override it.
+- **Context used** — a 6-segment bar and a `CALM`/`MED`/`WARN`/`CRIT` tag, based on the *last turn only*, not a running total. Answers "will my next message fit," not "how much have I used overall."
+- **Estimated cost** — built-in pricing for the current Sonnet/Opus/Haiku/Fable lineup; override via `claudeStatusline.pricing` (see [Cost estimates](#cost-estimates)).
 
-## Hover for details
-
-Hover over the Claude segment for the full token breakdown — input, output, cache write, and cache read separately — plus the transcript path being tracked:
+Hover the segment for a per-category token breakdown and the transcript path:
 
 ![Tooltip shown when hovering over the Claude segment, with a per-category token breakdown and the transcript path](docs/images/statusbar-hover.png)
 
 ## Session panel
 
-Click the Claude segment (or run **Claude Simple Stats Bar: Open Session Panel**) to open a panel beside your editor:
+Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 
 ![Session panel showing sessions in this workspace, a compaction note, a 7-day spend chart, and spend by model](docs/images/panel-anatomy.png)
 
-1. **Sessions in this workspace** — every Claude Code transcript found here, with the "primary" one (the one the status bar tracks) marked. Running more than one session at once? Use **Make primary** or the **Claude Simple Stats Bar: Switch Primary Session** command to pick a different one.
-2. **Last 7 days** — a spend chart and per-model breakdown for this workspace, stored locally and auto-pruned past 7 days.
-3. **Compaction** — a heuristic count of likely compaction events for the primary session, since context % only reflects the last turn. Best-effort, not exact (see [details](#how-compaction-detection-works)).
+1. **Sessions in this workspace** — every transcript found here, with the primary one marked. Running more than one session at once? Use **Make primary**, or the **Switch Primary Session** command, to pick a different one.
+2. **Last 7 days** — a spend chart and per-model breakdown, stored locally and pruned past 7 days.
+3. **Compaction** — a heuristic count of likely compaction events. See [Known limitations](#known-limitations).
 
 ## Settings
 
@@ -42,8 +48,8 @@ Click the Claude segment (or run **Claude Simple Stats Bar: Open Session Panel**
 | `claudeStatusline.enabled` | `true` | Show or hide the Claude segment. |
 | `claudeStatusline.pollIntervalMs` | `2000` | How often to re-check the transcript file, alongside the file watcher. |
 | `claudeStatusline.contextWindowTokens` | `1000000` | Context window size, used for context % and compaction detection. Lower this for a 200K-window model like Haiku 4.5. |
-| `claudeStatusline.sessionFile` | `""` | Pin one exact transcript path — overrides auto-detection and the panel's primary-session picker. Leave empty to auto-detect. |
-| `claudeStatusline.pricing` | `{}` | Per-model USD rates per 1M tokens; overrides or extends the built-in defaults (see [Cost estimates](#cost-estimates)). |
+| `claudeStatusline.sessionFile` | `""` | Pin one exact transcript path — overrides auto-detection and the panel's primary-session picker. |
+| `claudeStatusline.pricing` | `{}` | Per-model USD rates per 1M tokens; overrides or extends the built-in defaults. See [Cost estimates](#cost-estimates). |
 
 ## Commands
 
@@ -53,7 +59,40 @@ Click the Claude segment (or run **Claude Simple Stats Bar: Open Session Panel**
 | `Claude Simple Stats Bar: Open Session Panel` | Open the webview panel (also bound to clicking the Claude segment). |
 | `Claude Simple Stats Bar: Switch Primary Session` | Pick which concurrent session in this workspace is tracked as primary. |
 
+## Where the data comes from
+
+There's no public API for Claude Code session telemetry. This extension reads the same `.jsonl` transcript files Claude Code already writes to disk, under `~/.claude/projects/<workspace-path-with-slashes-replaced-by-dashes>/<session-id>.jsonl`. It scans every folder in a (possibly multi-root) workspace for a matching directory and picks the most recently modified file as primary, re-parsing it on file changes plus a periodic poll as a fallback.
+
+This is reverse-engineered from observed transcript files, not a documented format. If Claude Code changes it, `src/claudeSession/transcriptLocator.ts` and `src/claudeSession/transcriptParser.ts` are where to look.
+
+## Cost estimates
+
+Built-in USD rates ship for the current Sonnet/Opus/Haiku/Fable lineup (as of 2026-08), so cost shows without any setup. Anthropic's pricing changes over time — verify current rates before relying on this for anything beyond a rough estimate. Override a model's rate, or add one that isn't built in, via `claudeStatusline.pricing`:
+
+```json
+{
+  "claudeStatusline.pricing": {
+    "claude-sonnet-5": {
+      "inputPerMillion": 3,
+      "outputPerMillion": 15,
+      "cacheWritePerMillion": 3.75,
+      "cacheReadPerMillion": 0.3
+    }
+  }
+}
+```
+
+Models with neither a built-in default nor a configured entry show cost as `n/a`.
+
+## Known limitations
+
+- **Compaction count is a heuristic.** Transcripts carry no explicit compaction marker, so this infers one from a sharp drop in per-turn context tokens: a turn using at least 10% of the context window followed by one using less than 40%. False positives and negatives are both possible.
+- **Multi-session auto-pick can grab the wrong transcript** if several sessions are running in the same workspace at once. Use the panel's **Make primary**, the **Switch Primary Session** command, or `claudeStatusline.sessionFile` to pin the one you want.
+- **The Claude segment always sits on the far right** of the status bar, past everything VS Code or other extensions add. It uses a deliberately low priority so it doesn't compete with the built-in line/column, encoding, and language-mode indicators for space.
+
 ## Install
+
+Not on the Marketplace yet. To run it locally:
 
 **Try it without installing anything:**
 
@@ -74,51 +113,6 @@ code --install-extension vscode-claude-statusline-0.3.0.vsix
 
 Then reload the window (`Cmd+Shift+P` → "Developer: Reload Window"). After code changes, repeat the last two commands to update it.
 
-## Details
+## Changelog
 
-<details>
-<summary><strong>Where the session data comes from</strong></summary>
-
-There is no public API for Claude Code session telemetry. This extension reads the same local transcript files Claude Code already writes to disk:
-
-```
-~/.claude/projects/<workspace-path-with-slashes-replaced-by-dashes>/<session-id>.jsonl
-```
-
-It scans every folder in your (possibly multi-root) workspace for a matching transcript directory, then auto-picks the most recently modified `.jsonl` file across all of them as the "primary" session, re-parsing it on file changes plus a periodic poll as a fallback. This is reverse-engineered from observed behavior, not a documented contract — if Claude Code changes its storage format, update `src/claudeSession/transcriptLocator.ts` and `src/claudeSession/transcriptParser.ts` to match.
-
-If multiple sessions are running concurrently in the workspace, auto-pick can grab the wrong one — use the session panel's "Make primary" button, the **Claude Simple Stats Bar: Switch Primary Session** command, or pin an exact file with `claudeStatusline.sessionFile` (which always wins over both).
-</details>
-
-<details>
-<summary><strong id="cost-estimates">Cost estimates</strong></summary>
-
-Built-in default USD rates ship for the current model lineup (Sonnet, Opus, Haiku, Fable) as of 2026-08, so cost shows without any setup. Anthropic's rates change over time, so verify current pricing before relying on it for anything beyond a rough estimate. Override a model's rate, or add one for a model not in the defaults, via `claudeStatusline.pricing`:
-
-```json
-{
-  "claudeStatusline.pricing": {
-    "claude-sonnet-5": {
-      "inputPerMillion": 3,
-      "outputPerMillion": 15,
-      "cacheWritePerMillion": 3.75,
-      "cacheReadPerMillion": 0.3
-    }
-  }
-}
-```
-
-Entries here override the shipped default for that model id; models with neither a default nor a configured entry show cost as `n/a`.
-</details>
-
-<details>
-<summary><strong id="how-compaction-detection-works">How compaction detection works</strong></summary>
-
-Claude Code transcripts carry no explicit compaction marker (verified against real on-disk transcripts, including multi-thousand-line sessions). This heuristically infers a compaction from a sharp drop in per-turn context tokens: a turn using at least 10% of the context window followed by a turn using less than 40% of that. False negatives and positives are both possible — treat the count as a rough signal, not a log.
-</details>
-
-<details>
-<summary><strong>Status bar position</strong></summary>
-
-The Claude segment lives on the **right** side of the status bar, past everything else VS Code or other extensions add. This is deliberate: `createStatusBarItem` priority controls left/right ordering, so it uses a very low (negative) priority to guarantee it lands past the built-in line/column, encoding, and language-mode indicators rather than competing with them for space.
-</details>
+See [CHANGELOG.md](CHANGELOG.md).
