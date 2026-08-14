@@ -19,13 +19,13 @@
   <rect x="560" y="44" width="130" height="36" rx="6" fill="#007acc" />
 
   <g fill="#ffffff">
-    <use href="#i-hubot" x="45" y="51" width="14" height="14" />
+    <use href="#i-hubot" x="45" y="55" width="14" height="14" />
     <text x="68" y="67" font-size="13">claude-sonnet-5</text>
-    <use href="#i-pulse" x="245" y="51" width="14" height="14" />
+    <use href="#i-pulse" x="245" y="55" width="14" height="14" />
     <text x="268" y="67" font-size="13">2.4M tok</text>
-    <use href="#i-dashboard" x="405" y="51" width="14" height="14" />
+    <use href="#i-dashboard" x="405" y="55" width="14" height="14" />
     <text x="428" y="67" font-size="13">38% ctx</text>
-    <use href="#i-credit-card" x="575" y="51" width="14" height="14" />
+    <use href="#i-credit-card" x="575" y="55" width="14" height="14" />
     <text x="598" y="67" font-size="13">$0.842</text>
   </g>
 
@@ -66,11 +66,11 @@
   <rect x="370" y="248" width="160" height="36" rx="6" fill="#2d2d2d" stroke="#3c3c3c" />
 
   <g fill="#cccccc">
-    <use href="#i-hubot" x="45" y="255" width="14" height="14" />
+    <use href="#i-hubot" x="45" y="259" width="14" height="14" />
     <text x="66" y="271" font-size="13">&lt; 70%</text>
-    <use href="#i-warning" x="205" y="255" width="14" height="14" />
+    <use href="#i-warning" x="205" y="259" width="14" height="14" />
     <text x="226" y="271" font-size="13">≥ 70% used</text>
-    <use href="#i-flame" x="385" y="255" width="14" height="14" />
+    <use href="#i-flame" x="385" y="259" width="14" height="14" />
     <text x="406" y="271" font-size="13">≥ 90% used</text>
   </g>
 </svg>
