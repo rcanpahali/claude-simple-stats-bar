@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="92" viewBox="0 0 1000 92" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <!-- editor area sliver, just for context -->
+  <rect x="0" y="0" width="1000" height="54" fill="#1e1e1e" />
+  <rect x="0" y="0" width="1000" height="54" fill="#000000" opacity="0.15" />
+
+  <!-- status bar -->
+  <rect x="0" y="54" width="1000" height="38" fill="#007acc" />
+
+  <text x="978" y="78" text-anchor="end" font-size="13" fill="#ffffff">
+    📄 extension.ts    📍 Ln 42, Col 7    🔢 210 lines        🤖 claude-sonnet-5    ⚡ 2.4M tok    📊 38% ctx    💳 $0.842
+  </text>
+</svg>

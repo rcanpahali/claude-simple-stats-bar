@@ -14,13 +14,14 @@ export function activate(context: vscode.ExtensionContext): void {
   );
   refreshEditorItem();
 
-  const claudeBar = new ClaudeSessionStatusBar();
+  const claudeBar = new ClaudeSessionStatusBar(context);
   context.subscriptions.push(claudeBar);
 
   context.subscriptions.push(
     vscode.commands.registerCommand("claudeStatusline.refresh", () => claudeBar.refresh()),
-    vscode.commands.registerCommand("claudeStatusline.showSessionDetails", () =>
-      claudeBar.showDetails()
+    vscode.commands.registerCommand("claudeStatusline.openPanel", () => claudeBar.openPanel()),
+    vscode.commands.registerCommand("claudeStatusline.switchPrimarySession", () =>
+      claudeBar.switchPrimarySession()
     ),
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration("claudeStatusline")) {

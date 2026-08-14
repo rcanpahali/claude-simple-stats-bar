@@ -1,8 +1,11 @@
 import * as fs from "fs";
+import * as path from "path";
 import * as vscode from "vscode";
-import { findLatestTranscript, findProjectTranscriptDir } from "./transcriptLocator";
 import { parseTranscript, UsageTotals } from "./transcriptParser";
-import { estimateCostUsd, ModelPricing } from "./pricing";
+import { estimateCostUsd, ModelPricing, resolvePricing } from "./pricing";
+import { SessionManager } from "./sessionManager";
+import { ClaudeSessionPanel, PanelSessionInfo } from "./panel";
+import { formatLocalDate, HistoryStore, loadHistory, pruneOldDays, recordUsage, saveHistory } from "./history";
 
 function formatTokenCount(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -12,28 +15,44 @@ function formatTokenCount(n: number): string {
 
 export class ClaudeSessionStatusBar implements vscode.Disposable {
   private readonly item: vscode.StatusBarItem;
+  private readonly sessionManager = new SessionManager();
+  private readonly panel: ClaudeSessionPanel;
+  private readonly historyStorageDir?: string;
+  private readonly historyStore: HistoryStore;
+
   private watcher?: fs.FSWatcher;
   private pollTimer?: ReturnType<typeof setInterval>;
   private currentFile?: string;
   private lastUsage?: UsageTotals;
 
-  private contextWindowTokens = 200_000;
+  private contextWindowTokens = 1_000_000;
   private pollIntervalMs = 2000;
   private pricing: Record<string, ModelPricing> = {};
 
-  constructor() {
+  constructor(context: vscode.ExtensionContext) {
     this.item = vscode.window.createStatusBarItem(
       vscode.StatusBarAlignment.Right,
       -1000
     );
-    this.item.command = "claudeStatusline.showSessionDetails";
+    this.item.command = "claudeStatusline.openPanel";
+
+    this.panel = new ClaudeSessionPanel((file) => {
+      this.sessionManager.setManualPrimary(file);
+      this.refresh();
+    });
+
+    this.historyStorageDir = context.storageUri?.fsPath;
+    this.historyStore = this.historyStorageDir
+      ? loadHistory(this.historyStorageDir)
+      : { fileWatermarks: {}, daily: {} };
+
     this.reloadConfig();
   }
 
   reloadConfig(): void {
     const cfg = vscode.workspace.getConfiguration("claudeStatusline");
-    this.contextWindowTokens = cfg.get<number>("contextWindowTokens", 200_000);
-    this.pricing = cfg.get<Record<string, ModelPricing>>("pricing", {});
+    this.contextWindowTokens = cfg.get<number>("contextWindowTokens", 1_000_000);
+    this.pricing = resolvePricing(cfg.get<Record<string, ModelPricing>>("pricing", {}));
 
     const newPollIntervalMs = cfg.get<number>("pollIntervalMs", 2000);
     if (newPollIntervalMs !== this.pollIntervalMs || !this.pollTimer) {
@@ -47,27 +66,10 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
       return;
     }
     this.item.show();
-
-    const configuredFile = cfg.get<string>("sessionFile", "").trim();
-    if (configuredFile) {
-      this.trackFile(configuredFile);
-    } else {
-      this.autoDetect();
-    }
+    this.refresh();
   }
 
-  private autoDetect(): void {
-    const folders = vscode.workspace.workspaceFolders;
-    if (!folders || folders.length === 0) return;
-
-    const dir = findProjectTranscriptDir(folders[0].uri.fsPath);
-    if (!dir) return;
-
-    const latest = findLatestTranscript(dir);
-    if (latest) this.trackFile(latest);
-  }
-
-  private trackFile(file: string): void {
+  private ensureWatching(file: string): void {
     if (this.currentFile === file) return;
 
     this.watcher?.close();
@@ -77,20 +79,27 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
     } catch {
       // Best effort — the poll timer still covers updates if watching fails.
     }
-    this.refresh();
   }
 
   refresh(): void {
-    if (!this.currentFile || !fs.existsSync(this.currentFile)) {
-      this.autoDetect();
-    }
-    if (!this.currentFile) {
+    const cfg = vscode.workspace.getConfiguration("claudeStatusline");
+    const pinnedFile = cfg.get<string>("sessionFile", "").trim() || undefined;
+    const primary = this.sessionManager.resolvePrimary(pinnedFile);
+
+    if (!primary) {
+      this.watcher?.close();
+      this.watcher = undefined;
+      this.currentFile = undefined;
+      this.lastUsage = undefined;
       this.item.text = "$(hubot) no session";
       this.item.tooltip = "No Claude Code session transcript found for this workspace.";
+      if (this.panel.isVisible) this.panel.update([], this.historyStore);
       return;
     }
 
-    const usage = parseTranscript(this.currentFile);
+    this.ensureWatching(primary);
+
+    const usage = parseTranscript(primary, this.contextWindowTokens);
     this.lastUsage = usage;
 
     const totalTokens =
@@ -118,6 +127,36 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
       `$(dashboard) ${contextPct}% ctx · ` +
       `$(credit-card) ${costLabel}`;
     this.item.tooltip = this.buildTooltip(usage, contextPct, costLabel);
+
+    this.updateSessionsAndHistory(primary);
+  }
+
+  private updateSessionsAndHistory(primaryFile: string): void {
+    const sessions = this.sessionManager.listSessions();
+    const today = formatLocalDate(new Date());
+    const panelSessions: PanelSessionInfo[] = [];
+
+    for (const s of sessions) {
+      const usage =
+        s.file === primaryFile && this.lastUsage
+          ? this.lastUsage
+          : parseTranscript(s.file, this.contextWindowTokens);
+      const cost = estimateCostUsd(usage, this.pricing);
+      panelSessions.push({ file: s.file, usage, cost, isPrimary: s.file === primaryFile });
+
+      if (this.historyStorageDir) {
+        recordUsage(this.historyStore, s.file, usage, cost, today);
+      }
+    }
+
+    if (this.historyStorageDir) {
+      pruneOldDays(this.historyStore, today);
+      saveHistory(this.historyStorageDir, this.historyStore);
+    }
+
+    if (this.panel.isVisible) {
+      this.panel.update(panelSessions, this.historyStore);
+    }
   }
 
   private buildTooltip(
@@ -134,30 +173,55 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
     md.appendMarkdown(`- $(save) Cache write: ${usage.cacheCreationTokens.toLocaleString()}\n`);
     md.appendMarkdown(`- $(history) Cache read: ${usage.cacheReadTokens.toLocaleString()}\n`);
     md.appendMarkdown(`- $(dashboard) Context used (last turn): ~${contextPct}%\n`);
+    if (usage.compactionCount > 0) {
+      md.appendMarkdown(
+        `- $(refresh) Compacted ~${usage.compactionCount}x this session (heuristic)\n`
+      );
+    }
     md.appendMarkdown(`- $(credit-card) Estimated cost: ${costLabel}\n`);
     md.appendMarkdown(`\nTranscript: \`${this.currentFile}\`\n`);
     if (costLabel === "n/a") {
-      md.appendMarkdown("\n_Set `claudeStatusline.pricing` to enable cost estimates._");
+      md.appendMarkdown(
+        "\n_Unknown model — set `claudeStatusline.pricing` to enable a cost estimate for it._"
+      );
     }
+    md.appendMarkdown(`\n\nClick for the full session panel (all sessions, 7-day history).`);
     return md;
   }
 
-  showDetails(): void {
-    if (!this.lastUsage) {
-      vscode.window.showInformationMessage("No Claude Code session data available yet.");
+  openPanel(): void {
+    this.panel.reveal();
+    this.refresh();
+  }
+
+  async switchPrimarySession(): Promise<void> {
+    const sessions = this.sessionManager.listSessions();
+    if (sessions.length === 0) {
+      vscode.window.showInformationMessage(
+        "No Claude Code session transcripts found for this workspace."
+      );
       return;
     }
-    const u = this.lastUsage;
-    vscode.window.showInformationMessage(
-      `Model: ${u.model ?? "unknown"} — in: ${u.inputTokens.toLocaleString()}, ` +
-        `out: ${u.outputTokens.toLocaleString()}, cache write: ${u.cacheCreationTokens.toLocaleString()}, ` +
-        `cache read: ${u.cacheReadTokens.toLocaleString()}`
-    );
+
+    const items = sessions.map((s) => ({
+      label: path.basename(s.file, ".jsonl"),
+      description: new Date(s.mtimeMs).toLocaleString(),
+      file: s.file,
+    }));
+
+    const picked = await vscode.window.showQuickPick(items, {
+      placeHolder: "Select the session to treat as primary",
+    });
+    if (!picked) return;
+
+    this.sessionManager.setManualPrimary(picked.file);
+    this.refresh();
   }
 
   dispose(): void {
     this.watcher?.close();
     if (this.pollTimer) clearInterval(this.pollTimer);
+    this.panel.dispose();
     this.item.dispose();
   }
 }

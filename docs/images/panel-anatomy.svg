@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="700" viewBox="0 0 900 700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="900" height="700" fill="#1e1e1e" />
+
+  <!-- panel tab header -->
+  <rect x="0" y="0" width="900" height="36" fill="#252526" />
+  <rect x="10" y="7" width="140" height="22" rx="4" fill="#2d2d2d" />
+  <text x="24" y="22" font-size="12.5" fill="#e8e8e8">≡  Claude Session</text>
+
+  <!-- Sessions heading -->
+  <text x="40" y="76" font-size="16" font-weight="700" fill="#e8e8e8">Sessions (this workspace)</text>
+
+  <!-- badge 1: primary marker -->
+  <circle cx="20" cy="106" r="9" fill="#3794ff" />
+  <text x="20" y="110" text-anchor="middle" font-size="11" fill="#ffffff">1</text>
+
+  <!-- row 1: primary session -->
+  <circle cx="52" cy="106" r="5" fill="#4ec9b0" />
+  <text x="68" y="111" font-size="13" font-weight="600" fill="#4ec9b0">83d6e97d-b0f1-4fd9-99c4-3512bfa666bb</text>
+  <text x="860" y="111" text-anchor="end" font-size="13" fill="#cccccc">claude-sonnet-5    64.2M tok    $36.832</text>
+
+  <line x1="40" y1="128" x2="860" y2="128" stroke="#3c3c3c" stroke-width="1" />
+
+  <!-- row 2: secondary session -->
+  <circle cx="52" cy="154" r="5" fill="none" stroke="#8a8a8a" stroke-width="1.5" />
+  <text x="68" y="159" font-size="13" font-weight="600" fill="#e8e8e8">4ea8b9ae-d2fe-41b0-b3ff-bdc4145d23b1</text>
+  <text x="690" y="159" text-anchor="end" font-size="13" fill="#cccccc">claude-sonnet-5    972.3k tok    $0.705</text>
+  <rect x="710" y="145" width="110" height="26" rx="4" fill="#0e639c" />
+  <text x="765" y="162" text-anchor="middle" font-size="11.5" fill="#ffffff">Make primary</text>
+
+  <!-- badge 2: make primary button -->
+  <circle cx="838" cy="145" r="9" fill="#3794ff" />
+  <text x="838" y="149" text-anchor="middle" font-size="11" fill="#ffffff">2</text>
+
+  <line x1="40" y1="182" x2="860" y2="182" stroke="#3c3c3c" stroke-width="1" />
+
+  <!-- badge 3: compaction line -->
+  <circle cx="20" cy="207" r="9" fill="#3794ff" />
+  <text x="20" y="211" text-anchor="middle" font-size="11" fill="#ffffff">3</text>
+  <text x="40" y="212" font-size="12.5" fill="#9d9d9d">Compacted ~3x this session (heuristic) &#183; last around 8/14/2026, 4:08:05 PM</text>
+
+  <!-- Last 7 days -->
+  <text x="40" y="252" font-size="16" font-weight="700" fill="#e8e8e8">Last 7 days</text>
+
+  <!-- zero-value day columns -->
+  <g font-size="10.5" fill="#3794ff">
+    <text x="78" y="432" text-anchor="middle" text-decoration="underline">$0.00</text>
+    <text x="138" y="432" text-anchor="middle" text-decoration="underline">$0.00</text>
+    <text x="198" y="432" text-anchor="middle" text-decoration="underline">$0.00</text>
+    <text x="258" y="432" text-anchor="middle" text-decoration="underline">$0.00</text>
+    <text x="318" y="432" text-anchor="middle" text-decoration="underline">$0.00</text>
+    <text x="378" y="432" text-anchor="middle" text-decoration="underline">$0.00</text>
+  </g>
+  <g font-size="11" fill="#9d9d9d">
+    <text x="78" y="458" text-anchor="middle">08-08</text>
+    <text x="138" y="458" text-anchor="middle">08-09</text>
+    <text x="198" y="458" text-anchor="middle">08-10</text>
+    <text x="258" y="458" text-anchor="middle">08-11</text>
+    <text x="318" y="458" text-anchor="middle">08-12</text>
+    <text x="378" y="458" text-anchor="middle">08-13</text>
+    <text x="438" y="458" text-anchor="middle">08-14</text>
+  </g>
+
+  <!-- today's bar -->
+  <rect x="420" y="280" width="36" height="160" fill="#3794ff" />
+  <text x="438" y="270" text-anchor="middle" font-size="11" fill="#cccccc">$37.54</text>
+
+  <!-- Spend by model -->
+  <text x="40" y="512" font-size="16" font-weight="700" fill="#e8e8e8">Spend by model (7 days)</text>
+  <text x="40" y="542" font-size="13" fill="#cccccc">claude-sonnet-5</text>
+  <text x="860" y="542" text-anchor="end" font-size="13" fill="#cccccc">$37.537</text>
+  <line x1="40" y1="556" x2="860" y2="556" stroke="#3c3c3c" stroke-width="1" />
+
+  <!-- legend -->
+  <circle cx="20" cy="596" r="9" fill="#3794ff" /><text x="20" y="600" text-anchor="middle" font-size="11" fill="#ffffff">1</text>
+  <text x="40" y="600" font-size="12.5" fill="#9d9d9d">Primary session — auto-picked as the most recently active one</text>
+
+  <circle cx="20" cy="628" r="9" fill="#3794ff" /><text x="20" y="632" text-anchor="middle" font-size="11" fill="#ffffff">2</text>
+  <text x="40" y="632" font-size="12.5" fill="#9d9d9d">"Make primary" — switch which session is tracked, without touching settings</text>
+
+  <circle cx="20" cy="660" r="9" fill="#3794ff" /><text x="20" y="664" text-anchor="middle" font-size="11" fill="#ffffff">3</text>
+  <text x="40" y="664" font-size="12.5" fill="#9d9d9d">Compaction count is a heuristic (a sharp context-token drop), not an exact number</text>
+</svg>

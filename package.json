@@ -1,8 +1,8 @@
 {
   "name": "vscode-claude-statusline",
   "displayName": "Claude Statusline",
-  "description": "Editor stats and live Claude Code session usage (model, tokens, cost, context %) in the VS Code status bar.",
-  "version": "0.2.0",
+  "description": "Editor stats and live Claude Code session usage (model, tokens, cost, context %, multi-session and history) in the VS Code status bar.",
+  "version": "0.3.0",
   "publisher": "local",
   "private": true,
   "engines": {
@@ -18,8 +18,12 @@
         "title": "Claude Statusline: Refresh"
       },
       {
-        "command": "claudeStatusline.showSessionDetails",
-        "title": "Claude Statusline: Show Session Details"
+        "command": "claudeStatusline.openPanel",
+        "title": "Claude Statusline: Open Session Panel"
+      },
+      {
+        "command": "claudeStatusline.switchPrimarySession",
+        "title": "Claude Statusline: Switch Primary Session"
       }
     ],
     "configuration": {
@@ -37,18 +41,18 @@
         },
         "claudeStatusline.contextWindowTokens": {
           "type": "number",
-          "default": 200000,
-          "description": "Context window size (in tokens) used to estimate the context-usage percentage shown in the status bar."
+          "default": 1000000,
+          "description": "Context window size (in tokens) used to estimate the context-usage percentage shown in the status bar and to calibrate compaction detection. Defaults to 1,000,000 (current Sonnet/Opus/Fable models); lower this if you're on a 200K-window model like Haiku 4.5."
         },
         "claudeStatusline.sessionFile": {
           "type": "string",
           "default": "",
-          "description": "Absolute path to a specific Claude Code .jsonl transcript to track. Leave empty to auto-detect the most recently modified session for the current workspace under ~/.claude/projects/."
+          "description": "Absolute path to a specific Claude Code .jsonl transcript to track. Takes priority over both auto-detection and the 'Switch Primary Session' command. Leave empty to auto-detect the most recently modified session for the current workspace under ~/.claude/projects/."
         },
         "claudeStatusline.pricing": {
           "type": "object",
           "default": {},
-          "description": "USD price per 1,000,000 tokens, keyed by model id, e.g. { \"claude-sonnet-5\": { \"inputPerMillion\": 3, \"outputPerMillion\": 15, \"cacheWritePerMillion\": 3.75, \"cacheReadPerMillion\": 0.3 } }. No defaults are shipped — verify current Anthropic pricing before configuring, since the extension does not fetch or guess rates. Without an entry for a model, cost shows as n/a."
+          "description": "USD price per 1,000,000 tokens, keyed by model id, e.g. { \"claude-sonnet-5\": { \"inputPerMillion\": 3, \"outputPerMillion\": 15, \"cacheWritePerMillion\": 3.75, \"cacheReadPerMillion\": 0.3 } }. Built-in default rates ship for the current Sonnet/Opus/Haiku/Fable models; entries here override or add to those defaults. Verify current Anthropic pricing before configuring a custom entry, since the extension does not fetch or guess rates. Models with no default and no configured entry show cost as n/a."
         }
       }
     }
