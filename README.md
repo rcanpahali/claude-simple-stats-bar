@@ -19,6 +19,12 @@ It's built so you can see where a session stands — and what it's costing — w
 - **Context used** — based on the *last turn only*, not a running total — it answers "will my next message fit," not "how much have I used overall."
 - **Estimated cost** — built-in pricing covers the current Sonnet/Opus/Haiku/Fable models out of the box; see [Cost estimates](#cost-estimates) to override it.
 
+## Hover for details
+
+Hover over the Claude segment for the full token breakdown — input, output, cache write, and cache read separately — plus the transcript path being tracked:
+
+![Tooltip shown when hovering over the Claude segment, with a per-category token breakdown and the transcript path](docs/images/statusbar-hover.png)
+
 ## Session panel
 
 Click the Claude segment (or run **Claude Statusline: Open Session Panel**) to open a panel beside your editor:
