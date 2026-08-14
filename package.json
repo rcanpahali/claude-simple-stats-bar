@@ -5,6 +5,10 @@
   "version": "0.3.0",
   "publisher": "local",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rcanpahali/vscode-claude-statusline.git"
+  },
   "engines": {
     "vscode": "^1.90.0"
   },
