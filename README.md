@@ -7,7 +7,7 @@ Live Claude Code session stats — model, tokens, context left, cost — in the 
 ## Features
 
 - Status bar segment with current model, total tokens, context used, and estimated cost, updating live as the transcript grows.
-- Context usage shown as a 6-segment fill bar with a `CALM`/`MED`/`WARN`/`CRIT` tag, plus a matching model icon: neutral below 50%, a small graph at ≥50%, a warning triangle at ≥70%, a flame at ≥90%.
+- Context usage shown as a `CALM`/`MED`/`WARN`/`CRIT` tag next to a matching icon (neutral below 50%, a small graph at ≥50%, a warning triangle at ≥70%, a flame at ≥90%), plus an optional 6-segment fill bar — turn the bar off with `claudeStatusline.showContextBar` and keep just the icon, tag, and percentage.
 - Hover tooltip with the full token breakdown (input / output / cache write / cache read) and the transcript path being tracked.
 - Session panel with every session in the workspace, a 7-day spend chart, per-model spend, and a compaction count.
 - Multi-session support — auto-detects every Claude Code transcript in the workspace, with a switchable primary.
@@ -22,9 +22,9 @@ Live Claude Code session stats — model, tokens, context left, cost — in the 
 
 ![Anatomy of the Claude segment: model, total tokens, context used, estimated cost, and the four severity-tag states](docs/images/statusbar-anatomy.png)
 
-- **Model** icon — neutral, small graph, warning, or flame depending on context-usage tier (see Features above).
+- **Model** — the active model name, led by a dashboard icon.
 - **Total tokens** — input + output + cache for the whole session.
-- **Context used** — a 6-segment bar and a `CALM`/`MED`/`WARN`/`CRIT` tag, based on the *last turn only*, not a running total. Answers "will my next message fit," not "how much have I used overall."
+- **Context used** — a severity icon (neutral, small graph, warning, or flame; see Features above) next to the `CALM`/`MED`/`WARN`/`CRIT` tag and an optional fill bar, based on the *last turn only*, not a running total. Answers "will my next message fit," not "how much have I used overall."
 - **Estimated cost** — built-in pricing for the current Sonnet/Opus/Haiku/Fable lineup; override via `claudeStatusline.pricing` (see [Cost estimates](#cost-estimates)).
 
 Hover the segment for a per-category token breakdown and the transcript path:
@@ -48,6 +48,7 @@ Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 | `claudeStatusline.enabled` | `true` | Show or hide the Claude segment. |
 | `claudeStatusline.pollIntervalMs` | `2000` | How often to re-check the transcript file, alongside the file watcher. |
 | `claudeStatusline.contextWindowTokens` | `1000000` | Context window size, used for context % and compaction detection. Lower this for a 200K-window model like Haiku 4.5. |
+| `claudeStatusline.showContextBar` | `true` | Show the 6-segment fill bar next to the context-usage tag. Turn off to keep just the icon, tag, and percentage. |
 | `claudeStatusline.sessionFile` | `""` | Pin one exact transcript path — overrides auto-detection and the panel's primary-session picker. |
 | `claudeStatusline.pricing` | `{}` | Per-model USD rates per 1M tokens; overrides or extends the built-in defaults. See [Cost estimates](#cost-estimates). |
 

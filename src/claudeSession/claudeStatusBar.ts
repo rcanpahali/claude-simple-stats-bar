@@ -48,6 +48,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
   private contextWindowTokens = 1_000_000;
   private pollIntervalMs = 2000;
   private pricing: Record<string, ModelPricing> = {};
+  private showContextBar = true;
 
   constructor(context: vscode.ExtensionContext) {
     this.item = vscode.window.createStatusBarItem(
@@ -73,6 +74,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
     const cfg = vscode.workspace.getConfiguration("claudeStatusline");
     this.contextWindowTokens = cfg.get<number>("contextWindowTokens", 1_000_000);
     this.pricing = resolvePricing(cfg.get<Record<string, ModelPricing>>("pricing", {}));
+    this.showContextBar = cfg.get<boolean>("showContextBar", true);
 
     const newPollIntervalMs = cfg.get<number>("pollIntervalMs", 2000);
     if (newPollIntervalMs !== this.pollIntervalMs || !this.pollTimer) {
@@ -139,11 +141,14 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
     const cost = estimateCostUsd(usage, this.pricing);
     const costLabel = cost === undefined ? "n/a" : `$${cost.toFixed(3)}`;
     const severity = contextSeverity(contextPct);
+    const contextSegment = this.showContextBar
+      ? `${severity.tag} ${formatContextBar(contextPct)}  ${contextPct}% ctx`
+      : `${severity.tag}  ${contextPct}% ctx`;
 
     this.item.text =
-      `${severity.icon} ${usage.model ?? "claude"} · ` +
+      `$(dashboard) ${usage.model ?? "claude"} · ` +
       `$(pulse) ${formatTokenCount(totalTokens)} tok · ` +
-      `$(dashboard) ${severity.tag} ${formatContextBar(contextPct)}  ${contextPct}% ctx · ` +
+      `${severity.icon} ${contextSegment} · ` +
       `$(credit-card) ${costLabel}`;
     this.item.tooltip = this.buildTooltip(usage, contextPct, costLabel, severity);
 
@@ -192,8 +197,11 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
     md.appendMarkdown(`- $(arrow-up) Output tokens: ${usage.outputTokens.toLocaleString()}\n`);
     md.appendMarkdown(`- $(save) Cache write: ${usage.cacheCreationTokens.toLocaleString()}\n`);
     md.appendMarkdown(`- $(history) Cache read: ${usage.cacheReadTokens.toLocaleString()}\n`);
+    const tooltipContextSegment = this.showContextBar
+      ? `${severity.tag} ${formatContextBar(contextPct)}  ~${contextPct}%`
+      : `${severity.tag}  ~${contextPct}%`;
     md.appendMarkdown(
-      `- $(dashboard) Context used (last turn): ${severity.tag} ${formatContextBar(contextPct)}  ~${contextPct}%\n`
+      `- $(dashboard) Context used (last turn): ${severity.icon} ${tooltipContextSegment}\n`
     );
     if (usage.compactionCount > 0) {
       md.appendMarkdown(

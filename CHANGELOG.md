@@ -4,11 +4,15 @@ Notable changes to this extension, by version. Format follows [Keep a Changelog]
 
 ## [Unreleased]
 
+### Added
+
+- `claudeStatusline.showContextBar` setting to hide the 6-segment fill bar while keeping the severity icon, tag, and percentage.
+
 ### Changed
 
 - Rewrote the README for the Marketplace listing and moved version history into this changelog.
 - Updated the extension icon.
-- Context-usage indicator now shows a 6-segment fill bar and a `CALM`/`MED`/`WARN`/`CRIT` severity tag next to the model icon, replacing the icon-only escalation (calm <50%, medium 50–69%, warning 70–89%, critical ≥90%).
+- Context-usage indicator now shows a 6-segment fill bar and a `CALM`/`MED`/`WARN`/`CRIT` severity tag, replacing the icon-only escalation (calm <50%, medium 50–69%, warning 70–89%, critical ≥90%). The severity icon sits next to the tag; the segment's leading icon is now always `$(dashboard)`.
 
 ## [0.3.0] - 2026-08-14
 

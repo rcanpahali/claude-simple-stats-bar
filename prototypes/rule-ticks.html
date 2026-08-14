@@ -84,6 +84,19 @@
   .ticks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
   .ticks .mark { position: absolute; top: -14px; width: 1px; height: 8px; background: var(--line); }
 
+  .toggle-row {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    margin-top: 22px;
+    font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .toggle-row input { margin: 0; cursor: pointer; }
+  .toggle-hint { color: var(--muted); font-size: 12.5px; }
+  .toggle-hint code { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 11.5px; background: var(--line); padding: 1px 4px; border-radius: 3px; }
+
   .tiers {
     display: flex;
     gap: 8px;
@@ -187,7 +200,7 @@
   <div class="panel active" id="panel-bar">
     <div class="barwrap">
       <div class="vsbar" id="bar">
-        <span class="ic" id="icon">&#xeb08;</span>claude-sonnet-5 &middot; <span class="ic">&#xeb31;</span>2.3M tok &middot; <span class="ic">&#xeacd;</span><span id="tag">CALM </span><span id="fill">▮▮▮▯▯▯</span>&nbsp;&nbsp;<span id="pct">45</span>% ctx &middot; <span class="ic">&#xeac9;</span>$1.506
+        <span class="ic">&#xeacd;</span>claude-sonnet-5 &middot; <span class="ic">&#xeb31;</span>2.3M tok &middot; <span class="ic" id="icon">&#xeb08;</span><span id="tag">CALM </span><span id="fill">▮▮▮▯▯▯</span><span id="gap">&nbsp;&nbsp;</span><span id="pct">45</span>% ctx &middot; <span class="ic">&#xeac9;</span>$1.506
       </div>
     </div>
   </div>
@@ -203,7 +216,7 @@
           <li><span class="ic">&#xeaa1;</span>Output tokens: 54,437</li>
           <li><span class="ic">&#xeb4b;</span>Cache write: 192,494</li>
           <li><span class="ic">&#xea82;</span>Cache read: 7,161,518</li>
-          <li><span class="ic">&#xeacd;</span>Context used (last turn):&nbsp;<span id="tag-card">CALM </span><span id="fill-card">▮▮▮▯▯▯</span>&nbsp;&nbsp;~<span id="pct-card">45</span>%</li>
+          <li><span class="ic">&#xeacd;</span>Context used (last turn):&nbsp;<span class="ic" id="icon-card">&#xeb08;</span><span id="tag-card">CALM </span><span id="fill-card">▮▮▮▯▯▯</span><span id="gap-card">&nbsp;&nbsp;</span>~<span id="pct-card">45</span>%</li>
           <li><span class="ic">&#xeac9;</span>Estimated cost: $3.687</li>
         </ul>
         <p class="path">Transcript: /Users/you/.claude/projects/-Users-you-my-project/1a2b3c4d-5e6f-4a1b-9c3d-7f8e9a0b1c2d.jsonl</p>
@@ -215,11 +228,11 @@
           <div class="seg"><span class="ic">&#xea7b;</span>no file</div>
         </div>
         <div class="right">
-          <div class="seg"><span class="ic" id="icon-mini">&#xeb08;</span>claude-sonnet-5</div>
+          <div class="seg"><span class="ic">&#xeacd;</span>claude-sonnet-5</div>
           <div class="seg">&middot;</div>
           <div class="seg"><span class="ic">&#xeb31;</span>7.4M tok</div>
           <div class="seg">&middot;</div>
-          <div class="seg"><span class="ic">&#xeacd;</span><span id="tag-mini">CALM </span><span id="fill-mini">▮▮▮▯▯▯</span>&nbsp;&nbsp;<span id="pct-mini">45</span>% ctx</div>
+          <div class="seg"><span class="ic" id="icon-mini">&#xeb08;</span><span id="tag-mini">CALM </span><span id="fill-mini">▮▮▮▯▯▯</span><span id="gap-mini">&nbsp;&nbsp;</span><span id="pct-mini">45</span>% ctx</div>
           <div class="seg">&middot;</div>
           <div class="seg"><span class="ic">&#xeac9;</span>$3.687</div>
           <div class="seg"><span class="ic">&#xeb9a;</span></div>
@@ -236,6 +249,10 @@
       <span class="mark" style="left:70%"></span><span style="left:70%">70</span>
       <span class="mark" style="left:90%"></span><span style="left:90%">90</span>
     </div>
+    <label class="toggle-row">
+      <input type="checkbox" id="showBar" checked />
+      Show context bar <span class="toggle-hint">(new <code>claudeStatusline.showContextBar</code> setting &mdash; unchecked keeps the icon, tag, and percentage, just drops the bar)</span>
+    </label>
   </div>
 
   <div class="tiers">
@@ -278,7 +295,9 @@
   }
 
   const slider = document.getElementById('slider');
+  const showBar = document.getElementById('showBar');
   const fillEl = document.getElementById('fill');
+  const gapEl = document.getElementById('gap');
   const pctEl = document.getElementById('pct');
   const pctLabel = document.getElementById('pctLabel');
   const iconEl = document.getElementById('icon');
@@ -290,10 +309,16 @@
     critical: document.getElementById('tier-critical'),
   };
 
+  function applyBarVisibility(fillSpan, gapSpan) {
+    fillSpan.style.display = showBar.checked ? '' : 'none';
+    gapSpan.innerHTML = showBar.checked ? '&nbsp;&nbsp;' : '&nbsp;';
+  }
+
   function render() {
     const pct = Number(slider.value);
     const tier = tierFor(pct);
     fillEl.textContent = formatBar(pct);
+    applyBarVisibility(fillEl, gapEl);
     pctEl.textContent = String(pct);
     pctLabel.textContent = pct + '%';
     iconEl.textContent = ICONS[tier];
@@ -304,25 +329,32 @@
   }
 
   slider.addEventListener('input', render);
+  showBar.addEventListener('change', () => { render(); renderTooltip(); });
   render();
 
+  const iconCard = document.getElementById('icon-card');
   const tagCard = document.getElementById('tag-card');
   const fillCard = document.getElementById('fill-card');
+  const gapCard = document.getElementById('gap-card');
   const pctCard = document.getElementById('pct-card');
   const iconMini = document.getElementById('icon-mini');
   const tagMini = document.getElementById('tag-mini');
   const fillMini = document.getElementById('fill-mini');
+  const gapMini = document.getElementById('gap-mini');
   const pctMini = document.getElementById('pct-mini');
 
   function renderTooltip() {
     const pct = Number(slider.value);
     const tier = tierFor(pct);
+    iconCard.textContent = ICONS[tier];
     tagCard.textContent = TAGS[tier] + ' ';
     fillCard.textContent = formatBar(pct);
+    applyBarVisibility(fillCard, gapCard);
     pctCard.textContent = String(pct);
     iconMini.textContent = ICONS[tier];
     tagMini.textContent = TAGS[tier] + ' ';
     fillMini.textContent = formatBar(pct);
+    applyBarVisibility(fillMini, gapMini);
     pctMini.textContent = String(pct);
   }
 

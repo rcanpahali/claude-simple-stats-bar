@@ -49,6 +49,11 @@
           "default": 1000000,
           "description": "Context window size (in tokens) used to estimate the context-usage percentage shown in the status bar and to calibrate compaction detection. Defaults to 1,000,000 (current Sonnet/Opus/Fable models); lower this if you're on a 200K-window model like Haiku 4.5."
         },
+        "claudeStatusline.showContextBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the 6-segment fill bar next to the context-usage tag (CALM/MED/WARN/CRIT). Turn off to keep the icon, tag, and percentage without the bar."
+        },
         "claudeStatusline.sessionFile": {
           "type": "string",
           "default": "",
