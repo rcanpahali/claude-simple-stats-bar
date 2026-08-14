@@ -3,8 +3,9 @@
   "displayName": "Claude Statusline",
   "description": "Editor stats and live Claude Code session usage (model, tokens, cost, context %, multi-session and history) in the VS Code status bar.",
   "version": "0.3.0",
-  "publisher": "local",
-  "private": true,
+  "publisher": "rcanpahali",
+  "license": "MIT",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/rcanpahali/vscode-claude-statusline.git"
