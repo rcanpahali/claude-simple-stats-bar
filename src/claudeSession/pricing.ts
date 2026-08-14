@@ -10,7 +10,7 @@ export interface ModelPricing {
 /**
  * Default USD rates per 1,000,000 tokens for the current Claude model lineup
  * (as of 2026-08). Anthropic pricing changes over time, so this table is a
- * convenience default, not a guarantee — `claudeStatusline.pricing` entries
+ * convenience default, not a guarantee — `claudeSimpleStatsBar.pricing` entries
  * override a matching model id here, and new/renamed models can be added
  * the same way.
  */

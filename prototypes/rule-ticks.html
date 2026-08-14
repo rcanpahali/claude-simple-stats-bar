@@ -160,7 +160,7 @@
   }
   .card .hd { font-weight: 700; color: #fff; font-size: 14.5px; margin-bottom: 8px; }
   .card ul { list-style: none; margin: 0; padding: 0; }
-  .card li { display: flex; align-items: flex-start; }
+  .card li { display: flex; align-items: center; }
   .card li:before { content: "\2022"; margin-right: 8px; color: #8a8a8a; }
   .card .path { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; color: #cccccc; word-break: break-all; margin: 10px 0 0; }
   .card .foot { margin: 12px 0 0; color: #cccccc; }
@@ -182,6 +182,25 @@
   .tooltip-bar .left, .tooltip-bar .right { display: flex; align-items: center; }
   .tooltip-bar .seg { display: flex; align-items: center; margin-right: 14px; }
   .tooltip-bar .right .seg { margin-right: 0; margin-left: 14px; }
+
+  .panel-stage { background: #1e1e1e; border-radius: 8px; padding: 16px 20px 20px; }
+  .panel-body { color: #cccccc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .panel-body h2 { font-size: 1.1em; color: #ffffff; margin: 0 0 8px; }
+  .panel-body h2 + h2, .panel-body .compaction + h2 { margin-top: 24px; }
+  .panel-body ul { list-style: none; padding: 0; margin: 0; }
+  .panel-body li.session { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid #454545; }
+  .panel-body li.session .dot { color: #8a8a8a; }
+  .panel-body li.session.primary .dot { color: #89d185; }
+  .panel-body li.session .name { flex: 1; font-weight: 600; font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; }
+  .panel-body li.session.primary .name { color: #89d185; }
+  .panel-body li.session .model, .panel-body li.session .tokens { color: #9d9d9d; font-size: 0.9em; }
+  .panel-body li.session .cost { font-variant-numeric: tabular-nums; min-width: 58px; text-align: right; }
+  .panel-body button.switch { background: #0e639c; color: #ffffff; border: none; padding: 3px 10px; border-radius: 3px; cursor: pointer; font-size: 0.85em; }
+  .panel-body button.switch:hover { background: #1177bb; }
+  .panel-body .compaction { color: #9d9d9d; font-size: 0.9em; margin: 10px 0 0; }
+  .panel-body .chart .bar { fill: #3794ff; }
+  .panel-body .chart .bar-label, .panel-body .chart .bar-value { fill: #9d9d9d; font-size: 10px; }
+  .panel-body ul.model-breakdown li { display: flex; justify-content: space-between; padding: 3px 0; }
 </style>
 
 <div class="page">
@@ -195,6 +214,7 @@
   <div class="tabs">
     <button class="tab-btn active" data-tab="bar">Status bar</button>
     <button class="tab-btn" data-tab="tooltip">Tooltip</button>
+    <button class="tab-btn" data-tab="panel">Session panel</button>
   </div>
 
   <div class="panel active" id="panel-bar">
@@ -211,12 +231,12 @@
         <div class="beak"></div>
         <div class="hd"><span class="ic" style="font-size:15px;">&#xeb08;</span>Claude Code Session</div>
         <ul>
-          <li><span class="ic">&#xeb63;</span>Model: claude-sonnet-5</li>
+          <li><span class="ic">&#xeacd;</span>Model: claude-sonnet-5</li>
           <li><span class="ic">&#xea9a;</span>Input tokens: 194</li>
           <li><span class="ic">&#xeaa1;</span>Output tokens: 54,437</li>
           <li><span class="ic">&#xeb4b;</span>Cache write: 192,494</li>
           <li><span class="ic">&#xea82;</span>Cache read: 7,161,518</li>
-          <li><span class="ic">&#xeacd;</span>Context used (last turn):&nbsp;<span class="ic" id="icon-card">&#xeb08;</span><span id="tag-card">CALM </span><span id="fill-card">▮▮▮▯▯▯</span><span id="gap-card">&nbsp;&nbsp;</span>~<span id="pct-card">45</span>%</li>
+          <li><span class="ic">&#xebe2;</span>Context used (last turn): ~<span id="pct-card">45</span>%</li>
           <li><span class="ic">&#xeac9;</span>Estimated cost: $3.687</li>
         </ul>
         <p class="path">Transcript: /Users/you/.claude/projects/-Users-you-my-project/1a2b3c4d-5e6f-4a1b-9c3d-7f8e9a0b1c2d.jsonl</p>
@@ -241,6 +261,74 @@
     </div>
   </div>
 
+  <div class="panel" id="panel-panel">
+    <div class="panel-stage">
+      <div class="panel-body">
+        <h2>Sessions (this workspace)</h2>
+        <ul>
+          <li class="session primary">
+            <span class="dot">&#9679;</span>
+            <span class="name">1a2b3c4d-5e6f-4a1b-9c3d-7f8e9a0b1c2d</span>
+            <span class="model">claude-sonnet-5</span>
+            <span class="tokens">7.4M tok</span>
+            <span class="cost">$3.687</span>
+          </li>
+          <li class="session">
+            <span class="dot">&#9675;</span>
+            <span class="name">9f1e2d3c-4b5a-6978-8f01-2a3b4c5d6e7f</span>
+            <span class="model">claude-opus-5</span>
+            <span class="tokens">1.2M tok</span>
+            <span class="cost">$5.210</span>
+            <button class="switch">Make primary</button>
+          </li>
+          <li class="session">
+            <span class="dot">&#9675;</span>
+            <span class="name">55667788-99aa-4bbb-8ccc-ddeeff001122</span>
+            <span class="model">claude-haiku-4.5</span>
+            <span class="tokens">340k tok</span>
+            <span class="cost">$0.184</span>
+            <button class="switch">Make primary</button>
+          </li>
+          <li class="session">
+            <span class="dot">&#9675;</span>
+            <span class="name">b3c4d5e6-f7a8-49b0-8c1d-2e3f4a5b6c7d</span>
+            <span class="model">claude-opus-5</span>
+            <span class="tokens">2.8M tok</span>
+            <span class="cost">$1.932</span>
+            <button class="switch">Make primary</button>
+          </li>
+          <li class="session">
+            <span class="dot">&#9675;</span>
+            <span class="name">de305d54-75b4-431b-adb2-eb6b9e546013</span>
+            <span class="model">claude-sonnet-5</span>
+            <span class="tokens">615k tok</span>
+            <span class="cost">$0.402</span>
+            <button class="switch">Make primary</button>
+          </li>
+        </ul>
+        <p class="compaction">Compacted ~2x this session (heuristic) &middot; last around 8/14/2026, 3:42:10 PM</p>
+
+        <h2>Last 7 days</h2>
+        <svg width="336" height="140" class="chart">
+          <rect x="0" y="92" width="36" height="24" class="bar" /><text x="18" y="130" class="bar-label" text-anchor="middle">08-08</text><text x="18" y="88" class="bar-value" text-anchor="middle">$2.14</text>
+          <rect x="48" y="108" width="36" height="8" class="bar" /><text x="66" y="130" class="bar-label" text-anchor="middle">08-09</text><text x="66" y="104" class="bar-value" text-anchor="middle">$0.76</text>
+          <rect x="96" y="56" width="36" height="60" class="bar" /><text x="114" y="130" class="bar-label" text-anchor="middle">08-10</text><text x="114" y="52" class="bar-value" text-anchor="middle">$5.42</text>
+          <rect x="144" y="105" width="36" height="11" class="bar" /><text x="162" y="130" class="bar-label" text-anchor="middle">08-11</text><text x="162" y="101" class="bar-value" text-anchor="middle">$1.03</text>
+          <rect x="192" y="40" width="36" height="76" class="bar" /><text x="210" y="130" class="bar-label" text-anchor="middle">08-12</text><text x="210" y="36" class="bar-value" text-anchor="middle">$6.88</text>
+          <rect x="240" y="80" width="36" height="36" class="bar" /><text x="258" y="130" class="bar-label" text-anchor="middle">08-13</text><text x="258" y="76" class="bar-value" text-anchor="middle">$3.25</text>
+          <rect x="288" y="16" width="36" height="100" class="bar" /><text x="306" y="130" class="bar-label" text-anchor="middle">08-14</text><text x="306" y="12" class="bar-value" text-anchor="middle">$9.08</text>
+        </svg>
+
+        <h2>Spend by model (7 days)</h2>
+        <ul class="model-breakdown">
+          <li><span class="model">claude-sonnet-5</span><span class="cost">$18.200</span></li>
+          <li><span class="model">claude-opus-5</span><span class="cost">$8.940</span></li>
+          <li><span class="model">claude-haiku-4.5</span><span class="cost">$1.420</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
   <div class="controls">
     <label>context used <b id="pctLabel">45%</b></label>
     <input type="range" id="slider" min="0" max="100" value="45" step="1" />
@@ -251,7 +339,7 @@
     </div>
     <label class="toggle-row">
       <input type="checkbox" id="showBar" checked />
-      Show context bar <span class="toggle-hint">(new <code>claudeStatusline.showContextBar</code> setting &mdash; unchecked keeps the icon, tag, and percentage, just drops the bar)</span>
+      Show context bar <span class="toggle-hint">(new <code>claudeSimpleStatsBar.showContextBar</code> setting &mdash; unchecked keeps the icon, tag, and percentage, just drops the bar)</span>
     </label>
   </div>
 
@@ -274,7 +362,7 @@
     </div>
   </div>
 
-  <footer>&ldquo;medium&rdquo; and the <code>$(graph-line)</code> icon are placeholders for the new tier &mdash; rename or swap the icon if something else reads better. The <code>CALM</code>/<code>MED</code>/<code>WARN</code>/<code>CRIT</code> tag is new too &mdash; drop it if the icon + bar already read clearly enough on their own. Switch to the <b>Tooltip</b> tab above to see the same state in the hover card.</footer>
+  <footer>&ldquo;medium&rdquo; and the <code>$(graph-line)</code> icon are placeholders for the new tier &mdash; rename or swap the icon if something else reads better. The <code>CALM</code>/<code>MED</code>/<code>WARN</code>/<code>CRIT</code> tag is new too &mdash; drop it if the icon + bar already read clearly enough on their own. Switch to the <b>Tooltip</b> tab above to see the same state reflected in the status bar row underneath the hover card &mdash; the ctx gauge is status-bar-only, so the card itself doesn't repeat it. Or see <b>Session panel</b> for the full multi-session breakdown (no ctx gauge there either &mdash; that indicator is only per-turn, so it doesn't map cleanly onto a list of sessions).</footer>
 </div>
 
 <script>
@@ -332,30 +420,22 @@
   showBar.addEventListener('change', () => { render(); renderTooltip(); });
   render();
 
-  const iconCard = document.getElementById('icon-card');
-  const tagCard = document.getElementById('tag-card');
-  const fillCard = document.getElementById('fill-card');
-  const gapCard = document.getElementById('gap-card');
-  const pctCard = document.getElementById('pct-card');
   const iconMini = document.getElementById('icon-mini');
   const tagMini = document.getElementById('tag-mini');
   const fillMini = document.getElementById('fill-mini');
   const gapMini = document.getElementById('gap-mini');
   const pctMini = document.getElementById('pct-mini');
+  const pctCard = document.getElementById('pct-card');
 
   function renderTooltip() {
     const pct = Number(slider.value);
     const tier = tierFor(pct);
-    iconCard.textContent = ICONS[tier];
-    tagCard.textContent = TAGS[tier] + ' ';
-    fillCard.textContent = formatBar(pct);
-    applyBarVisibility(fillCard, gapCard);
-    pctCard.textContent = String(pct);
     iconMini.textContent = ICONS[tier];
     tagMini.textContent = TAGS[tier] + ' ';
     fillMini.textContent = formatBar(pct);
     applyBarVisibility(fillMini, gapMini);
     pctMini.textContent = String(pct);
+    pctCard.textContent = String(pct);
   }
 
   slider.addEventListener('input', renderTooltip);
@@ -365,6 +445,7 @@
   const panels = {
     bar: document.getElementById('panel-bar'),
     tooltip: document.getElementById('panel-tooltip'),
+    panel: document.getElementById('panel-panel'),
   };
   tabBtns.forEach((btn) => {
     btn.addEventListener('click', () => {

@@ -27,7 +27,7 @@ export class ClaudeSessionPanel implements vscode.Disposable {
     }
 
     this.panel = vscode.window.createWebviewPanel(
-      "claudeStatuslinePanel",
+      "claudeSimpleStatsBarPanel",
       "Claude Session",
       vscode.ViewColumn.Beside,
       { enableScripts: true, retainContextWhenHidden: true }

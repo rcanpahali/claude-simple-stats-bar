@@ -20,7 +20,7 @@ export class SessionManager {
     return findAllTranscripts(dirs);
   }
 
-  /** `pinnedFile` (the `claudeStatusline.sessionFile` setting) always wins when set. */
+  /** `pinnedFile` (the `claudeSimpleStatsBar.sessionFile` setting) always wins when set. */
   resolvePrimary(pinnedFile: string | undefined): string | undefined {
     if (pinnedFile) return pinnedFile;
 

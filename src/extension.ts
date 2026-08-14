@@ -18,13 +18,13 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(claudeBar);
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("claudeStatusline.refresh", () => claudeBar.refresh()),
-    vscode.commands.registerCommand("claudeStatusline.openPanel", () => claudeBar.openPanel()),
-    vscode.commands.registerCommand("claudeStatusline.switchPrimarySession", () =>
+    vscode.commands.registerCommand("claudeSimpleStatsBar.refresh", () => claudeBar.refresh()),
+    vscode.commands.registerCommand("claudeSimpleStatsBar.openPanel", () => claudeBar.openPanel()),
+    vscode.commands.registerCommand("claudeSimpleStatsBar.switchPrimarySession", () =>
       claudeBar.switchPrimarySession()
     ),
     vscode.workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration("claudeStatusline")) {
+      if (e.affectsConfiguration("claudeSimpleStatsBar")) {
         claudeBar.reloadConfig();
       }
     })

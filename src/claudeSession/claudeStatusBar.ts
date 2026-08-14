@@ -55,7 +55,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
       vscode.StatusBarAlignment.Right,
       -1000
     );
-    this.item.command = "claudeStatusline.openPanel";
+    this.item.command = "claudeSimpleStatsBar.openPanel";
 
     this.panel = new ClaudeSessionPanel((file) => {
       this.sessionManager.setManualPrimary(file);
@@ -71,7 +71,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
   }
 
   reloadConfig(): void {
-    const cfg = vscode.workspace.getConfiguration("claudeStatusline");
+    const cfg = vscode.workspace.getConfiguration("claudeSimpleStatsBar");
     this.contextWindowTokens = cfg.get<number>("contextWindowTokens", 1_000_000);
     this.pricing = resolvePricing(cfg.get<Record<string, ModelPricing>>("pricing", {}));
     this.showContextBar = cfg.get<boolean>("showContextBar", true);
@@ -104,7 +104,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
   }
 
   refresh(): void {
-    const cfg = vscode.workspace.getConfiguration("claudeStatusline");
+    const cfg = vscode.workspace.getConfiguration("claudeSimpleStatsBar");
     const pinnedFile = cfg.get<string>("sessionFile", "").trim() || undefined;
     const primary = this.sessionManager.resolvePrimary(pinnedFile);
 
@@ -150,7 +150,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
       `$(pulse) ${formatTokenCount(totalTokens)} tok · ` +
       `${severity.icon} ${contextSegment} · ` +
       `$(credit-card) ${costLabel}`;
-    this.item.tooltip = this.buildTooltip(usage, contextPct, costLabel, severity);
+    this.item.tooltip = this.buildTooltip(usage, contextPct, costLabel);
 
     this.updateSessionsAndHistory(primary);
   }
@@ -186,23 +186,17 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
   private buildTooltip(
     usage: UsageTotals,
     contextPct: number,
-    costLabel: string,
-    severity: ContextSeverity
+    costLabel: string
   ): vscode.MarkdownString {
     const md = new vscode.MarkdownString();
     md.supportThemeIcons = true;
     md.appendMarkdown("**$(hubot) Claude Code Session**\n\n");
-    md.appendMarkdown(`- $(symbol-misc) Model: ${usage.model ?? "unknown"}\n`);
+    md.appendMarkdown(`- $(dashboard) Model: ${usage.model ?? "unknown"}\n`);
     md.appendMarkdown(`- $(arrow-down) Input tokens: ${usage.inputTokens.toLocaleString()}\n`);
     md.appendMarkdown(`- $(arrow-up) Output tokens: ${usage.outputTokens.toLocaleString()}\n`);
     md.appendMarkdown(`- $(save) Cache write: ${usage.cacheCreationTokens.toLocaleString()}\n`);
     md.appendMarkdown(`- $(history) Cache read: ${usage.cacheReadTokens.toLocaleString()}\n`);
-    const tooltipContextSegment = this.showContextBar
-      ? `${severity.tag} ${formatContextBar(contextPct)}  ~${contextPct}%`
-      : `${severity.tag}  ~${contextPct}%`;
-    md.appendMarkdown(
-      `- $(dashboard) Context used (last turn): ${severity.icon} ${tooltipContextSegment}\n`
-    );
+    md.appendMarkdown(`- $(graph-line) Context used (last turn): ~${contextPct}%\n`);
     if (usage.compactionCount > 0) {
       md.appendMarkdown(
         `- $(refresh) Compacted ~${usage.compactionCount}x this session (heuristic)\n`
@@ -212,7 +206,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
     md.appendMarkdown(`\nTranscript: \`${this.currentFile}\`\n`);
     if (costLabel === "n/a") {
       md.appendMarkdown(
-        "\n_Unknown model — set `claudeStatusline.pricing` to enable a cost estimate for it._"
+        "\n_Unknown model — set `claudeSimpleStatsBar.pricing` to enable a cost estimate for it._"
       );
     }
     md.appendMarkdown(`\n\nClick for the full session panel (all sessions, 7-day history).`);
