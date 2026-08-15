@@ -137,6 +137,9 @@
   .panel { display: none; }
   .panel.active { display: block; }
 
+  .severity-controls { display: none; }
+  .severity-controls.active { display: block; }
+
   .tooltip-stage { background: #1e1e1e; border-radius: 8px; padding: 20px 20px 0; overflow: hidden; }
   .card {
     background: #252526;
@@ -151,7 +154,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   .card .beak {
-    position: absolute; left: 96px; bottom: -8px; width: 0; height: 0;
+    position: absolute; right: 96px; bottom: -8px; width: 0; height: 0;
     border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #454545;
   }
   .card .beak::after {
@@ -201,6 +204,10 @@
   .panel-body li.session .cost { font-variant-numeric: tabular-nums; min-width: 58px; text-align: right; }
   .panel-body button.switch { background: #0e639c; color: #ffffff; border: none; padding: 3px 10px; border-radius: 3px; cursor: pointer; font-size: 0.85em; }
   .panel-body button.switch:hover { background: #1177bb; }
+  .panel-body ul.sessions li.session.extra { display: none; }
+  .panel-body ul.sessions.expanded li.session.extra { display: flex; }
+  .panel-body button.show-more { background: transparent; color: #3794ff; border: none; padding: 7px 0 0; cursor: pointer; font-size: 0.85em; display: block; }
+  .panel-body button.show-more:hover { text-decoration: underline; }
   .panel-body .compaction { color: #9d9d9d; font-size: 0.9em; margin: 10px 0 0; }
   .panel-body .chart .bar { fill: #3794ff; }
   .panel-body .chart .bar-label, .panel-body .chart .bar-value { fill: #9d9d9d; font-size: 10px; }
@@ -273,7 +280,7 @@
           <button class="settings">&#9881; Extension Settings</button>
         </div>
         <h2>Sessions (this workspace)</h2>
-        <ul>
+        <ul class="sessions" id="sessionList">
           <li class="session primary">
             <span class="dot">&#9679;</span>
             <span class="name">storefront-82 &middot; last active 4:52 PM</span>
@@ -321,7 +328,72 @@
             <span class="cost">$0.615</span>
             <button class="switch">Make primary</button>
           </li>
+          <li class="session extra">
+            <span class="dot">&#9675;</span>
+            <span class="name">7a2b9c1d &middot; ended on April 30, Thu</span>
+            <span class="model">claude-sonnet-5</span>
+            <span class="tokens">890k tok</span>
+            <span class="cost">$0.541</span>
+            <button class="switch">Make primary</button>
+          </li>
+          <li class="session extra">
+            <span class="dot">&#9675;</span>
+            <span class="name">1c3d5e7f &middot; ended on April 22, Wed</span>
+            <span class="model">claude-opus-5</span>
+            <span class="tokens">3.4M tok</span>
+            <span class="cost">$2.318</span>
+            <button class="switch">Make primary</button>
+          </li>
+          <li class="session extra">
+            <span class="dot">&#9675;</span>
+            <span class="name">4e6f8a0b &middot; ended on April 15, Wed</span>
+            <span class="model">claude-haiku-4.5</span>
+            <span class="tokens">210k tok</span>
+            <span class="cost">$0.098</span>
+            <button class="switch">Make primary</button>
+          </li>
+          <li class="session extra">
+            <span class="dot">&#9675;</span>
+            <span class="name">2d4b6c8e &middot; ended on March 30, Mon</span>
+            <span class="model">claude-sonnet-5</span>
+            <span class="tokens">1.5M tok</span>
+            <span class="cost">$0.877</span>
+            <button class="switch">Make primary</button>
+          </li>
+          <li class="session extra">
+            <span class="dot">&#9675;</span>
+            <span class="name">8f0a2c4e &middot; ended on March 18, Wed</span>
+            <span class="model">claude-sonnet-5</span>
+            <span class="tokens">460k tok</span>
+            <span class="cost">$0.256</span>
+            <button class="switch">Make primary</button>
+          </li>
+          <li class="session extra">
+            <span class="dot">&#9675;</span>
+            <span class="name">6b8d0f2a &middot; ended on February 27, Fri</span>
+            <span class="model">claude-opus-5</span>
+            <span class="tokens">2.1M tok</span>
+            <span class="cost">$1.404</span>
+            <button class="switch">Make primary</button>
+          </li>
+          <li class="session extra">
+            <span class="dot">&#9675;</span>
+            <span class="name">3a5c7e9b &middot; ended on February 10, Tue</span>
+            <span class="model">claude-sonnet-5</span>
+            <span class="tokens">725k tok</span>
+            <span class="cost">$0.389</span>
+            <button class="switch">Make primary</button>
+          </li>
+          <li class="session extra">
+            <span class="dot">&#9675;</span>
+            <span class="name">0e2f4a6c &middot; ended on January 22, Thu</span>
+            <span class="model">claude-sonnet-5</span>
+            <span class="tokens">980k tok</span>
+            <span class="cost">$0.612</span>
+            <button class="switch">Make primary</button>
+          </li>
         </ul>
+        <button class="show-more" id="showMoreBtn">Show 8 more sessions</button>
         <p class="compaction">Compacted ~2x this session (heuristic) &middot; last around 8/14/2026, 3:42:10 PM</p>
 
         <h2>Last 7 days</h2>
@@ -345,40 +417,42 @@
     </div>
   </div>
 
-  <div class="controls">
-    <label>context used <b id="pctLabel">45%</b></label>
-    <input type="range" id="slider" min="0" max="100" value="45" step="1" />
-    <div class="ticks">
-      <span class="mark" style="left:50%"></span><span style="left:50%">50</span>
-      <span class="mark" style="left:70%"></span><span style="left:70%">70</span>
-      <span class="mark" style="left:90%"></span><span style="left:90%">90</span>
+  <div class="severity-controls active" id="severityControls">
+    <div class="controls">
+      <label>context used <b id="pctLabel">45%</b></label>
+      <input type="range" id="slider" min="0" max="100" value="45" step="1" />
+      <div class="ticks">
+        <span class="mark" style="left:50%"></span><span style="left:50%">50</span>
+        <span class="mark" style="left:70%"></span><span style="left:70%">70</span>
+        <span class="mark" style="left:90%"></span><span style="left:90%">90</span>
+      </div>
+      <label class="toggle-row">
+        <input type="checkbox" id="showBar" checked />
+        Show context bar <span class="toggle-hint">(new <code>claudeSimpleStatsBar.showContextBar</code> setting &mdash; unchecked keeps the icon, tag, and percentage, just drops the bar)</span>
+      </label>
     </div>
-    <label class="toggle-row">
-      <input type="checkbox" id="showBar" checked />
-      Show context bar <span class="toggle-hint">(new <code>claudeSimpleStatsBar.showContextBar</code> setting &mdash; unchecked keeps the icon, tag, and percentage, just drops the bar)</span>
-    </label>
-  </div>
 
-  <div class="tiers">
-    <div class="tier calm" id="tier-calm">
-      <div class="name"><span class="ic" style="font-size:13px;">&#xeb08;</span>calm</div>
-      <div class="range">&lt; 50%</div>
+    <div class="tiers">
+      <div class="tier calm" id="tier-calm">
+        <div class="name"><span class="ic" style="font-size:13px;">&#xeb08;</span>calm</div>
+        <div class="range">&lt; 50%</div>
+      </div>
+      <div class="tier elevated" id="tier-elevated">
+        <div class="name"><span class="ic" style="font-size:13px;">&#xebe2;</span>medium</div>
+        <div class="range">50&ndash;69%</div>
+      </div>
+      <div class="tier warning" id="tier-warning">
+        <div class="name"><span class="ic" style="font-size:13px;">&#xea6c;</span>warning</div>
+        <div class="range">70&ndash;89%</div>
+      </div>
+      <div class="tier critical" id="tier-critical">
+        <div class="name"><span class="ic" style="font-size:13px;">&#xeaf2;</span>critical</div>
+        <div class="range">&ge; 90%</div>
+      </div>
     </div>
-    <div class="tier elevated" id="tier-elevated">
-      <div class="name"><span class="ic" style="font-size:13px;">&#xebe2;</span>medium</div>
-      <div class="range">50&ndash;69%</div>
-    </div>
-    <div class="tier warning" id="tier-warning">
-      <div class="name"><span class="ic" style="font-size:13px;">&#xea6c;</span>warning</div>
-      <div class="range">70&ndash;89%</div>
-    </div>
-    <div class="tier critical" id="tier-critical">
-      <div class="name"><span class="ic" style="font-size:13px;">&#xeaf2;</span>critical</div>
-      <div class="range">&ge; 90%</div>
-    </div>
-  </div>
 
-  <footer>&ldquo;medium&rdquo; and the <code>$(graph-line)</code> icon are placeholders for the new tier &mdash; rename or swap the icon if something else reads better. The <code>CALM</code>/<code>MED</code>/<code>WARN</code>/<code>CRIT</code> tag is new too &mdash; drop it if the icon + bar already read clearly enough on their own. Switch to the <b>Tooltip</b> tab above to see the same state reflected in the status bar row underneath the hover card &mdash; the ctx gauge is status-bar-only, so the card itself doesn't repeat it. Or see <b>Session panel</b> for the full multi-session breakdown (no ctx gauge there either &mdash; that indicator is only per-turn, so it doesn't map cleanly onto a list of sessions).</footer>
+    <footer>&ldquo;medium&rdquo; and the <code>$(graph-line)</code> icon are placeholders for the new tier &mdash; rename or swap the icon if something else reads better. The <code>CALM</code>/<code>MED</code>/<code>WARN</code>/<code>CRIT</code> tag is new too &mdash; drop it if the icon + bar already read clearly enough on their own. Set a level here, then switch to the <b>Tooltip</b> tab to see it reflected in the status bar row underneath the hover card &mdash; the ctx gauge is status-bar-only, so the card itself doesn't repeat it. The <b>Session panel</b> tab has no ctx gauge at all &mdash; that indicator is only per-turn, so it doesn't map cleanly onto a list of sessions.</footer>
+  </div>
 </div>
 
 <script>
@@ -457,18 +531,34 @@
   slider.addEventListener('input', renderTooltip);
   renderTooltip();
 
+  const sessionList = document.getElementById('sessionList');
+  const showMoreBtn = document.getElementById('showMoreBtn');
+  const extraCount = sessionList.querySelectorAll('li.session.extra').length;
+  if (extraCount > 0) {
+    const moreLabel = `Show ${extraCount} more session${extraCount === 1 ? '' : 's'}`;
+    showMoreBtn.textContent = moreLabel;
+    showMoreBtn.addEventListener('click', () => {
+      const expanded = sessionList.classList.toggle('expanded');
+      showMoreBtn.textContent = expanded ? 'Show fewer sessions' : moreLabel;
+    });
+  } else {
+    showMoreBtn.style.display = 'none';
+  }
+
   const tabBtns = document.querySelectorAll('.tab-btn');
   const panels = {
     bar: document.getElementById('panel-bar'),
     tooltip: document.getElementById('panel-tooltip'),
     panel: document.getElementById('panel-panel'),
   };
+  const severityControls = document.getElementById('severityControls');
   tabBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
       tabBtns.forEach((b) => b.classList.toggle('active', b === btn));
       Object.keys(panels).forEach((key) => {
         panels[key].classList.toggle('active', key === btn.dataset.tab);
       });
+      severityControls.classList.toggle('active', btn.dataset.tab === 'bar');
     });
   });
 </script>

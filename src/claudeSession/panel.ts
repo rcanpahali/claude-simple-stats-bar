@@ -11,9 +11,18 @@ export interface PanelSessionInfo {
   isPrimary: boolean;
 }
 
+/** How many sessions show by default before the rest collapse behind "Show more". */
+const VISIBLE_SESSION_LIMIT = 6;
+
 /** Floating webview panel opened from the status bar: session breakdown, compaction status, 7-day spend chart. */
 export class ClaudeSessionPanel implements vscode.Disposable {
   private panel?: vscode.WebviewPanel;
+  /**
+   * `update()` replaces the webview's entire HTML (on a 2s poll by default), which
+   * would reset any in-page toggle state — so the "show more" expansion is tracked
+   * here instead of relying on the webview's own DOM/JS state surviving re-renders.
+   */
+  private sessionListExpanded = false;
 
   constructor(private readonly onSwitchPrimary: (file: string) => void) {}
 
@@ -41,13 +50,15 @@ export class ClaudeSessionPanel implements vscode.Disposable {
         this.onSwitchPrimary(message.file);
       } else if (message?.type === "openSettings") {
         vscode.commands.executeCommand("workbench.action.openSettings", "@ext:rcanpahali.claude-simple-stats-bar");
+      } else if (message?.type === "toggleSessionList" && typeof message.expanded === "boolean") {
+        this.sessionListExpanded = message.expanded;
       }
     });
   }
 
   update(sessions: PanelSessionInfo[], history: HistoryStore): void {
     if (!this.panel) return;
-    this.panel.webview.html = renderHtml(sessions, history);
+    this.panel.webview.html = renderHtml(sessions, history, this.sessionListExpanded);
   }
 
   dispose(): void {
@@ -65,13 +76,13 @@ function formatTokenCount(n: number): string {
   return `${n}`;
 }
 
-function renderSessionRow(s: PanelSessionInfo): string {
+function renderSessionRow(s: PanelSessionInfo, extra: boolean): string {
   const total =
     s.usage.inputTokens + s.usage.outputTokens + s.usage.cacheCreationTokens + s.usage.cacheReadTokens;
   const costLabel = s.cost === undefined ? "n/a" : `$${s.cost.toFixed(3)}`;
 
   return `
-    <li class="session${s.isPrimary ? " primary" : ""}">
+    <li class="session${s.isPrimary ? " primary" : ""}${extra ? " extra" : ""}">
       <span class="dot">${s.isPrimary ? "●" : "○"}</span>
       <span class="name" title="${esc(s.file)}">${esc(s.name)}</span>
       <span class="model">${esc(s.usage.model ?? "unknown")}</span>
@@ -156,9 +167,19 @@ function renderModelBreakdown(history: HistoryStore): string {
     .join("")}</ul>`;
 }
 
-function renderHtml(sessions: PanelSessionInfo[], history: HistoryStore): string {
+function renderHtml(sessions: PanelSessionInfo[], history: HistoryStore, sessionListExpanded: boolean): string {
   const primary = sessions.find((s) => s.isPrimary);
-  const rows = sessions.map(renderSessionRow).join("");
+  const rows = sessions
+    .map((s, i) => renderSessionRow(s, i >= VISIBLE_SESSION_LIMIT))
+    .join("");
+  const extraCount = Math.max(0, sessions.length - VISIBLE_SESSION_LIMIT);
+  const moreLabel = `Show ${extraCount} more session${extraCount === 1 ? "" : "s"}`;
+  const showMoreButton =
+    extraCount > 0
+      ? `<button class="show-more" id="showMoreBtn" data-more-label="${esc(moreLabel)}">${
+          sessionListExpanded ? "Show fewer sessions" : moreLabel
+        }</button>`
+      : "";
 
   return `<!doctype html>
 <html>
@@ -179,6 +200,10 @@ function renderHtml(sessions: PanelSessionInfo[], history: HistoryStore): string
   li.session .cost { font-variant-numeric: tabular-nums; min-width: 60px; text-align: right; }
   button.switch { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 0.85em; }
   button.switch:hover { background: var(--vscode-button-hoverBackground); }
+  ul.sessions li.session.extra { display: none; }
+  ul.sessions.expanded li.session.extra { display: flex; }
+  button.show-more { background: transparent; color: var(--vscode-textLink-foreground, #3794ff); border: none; padding: 7px 0 0; cursor: pointer; font-size: 0.85em; display: block; }
+  button.show-more:hover { text-decoration: underline; }
   .compaction { color: var(--vscode-descriptionForeground); font-size: 0.9em; }
   .chart .bar { fill: var(--vscode-charts-blue, #3794ff); }
   .chart .bar-label, .chart .bar-value { fill: var(--vscode-descriptionForeground); font-size: 10px; }
@@ -191,7 +216,8 @@ function renderHtml(sessions: PanelSessionInfo[], history: HistoryStore): string
     <button class="settings" id="openSettings">&#9881; Extension Settings</button>
   </div>
   <h2>Sessions (this workspace)</h2>
-  <ul>${rows || "<li>No Claude Code session transcripts found for this workspace.</li>"}</ul>
+  <ul class="sessions${sessionListExpanded ? " expanded" : ""}" id="sessionList">${rows || "<li>No Claude Code session transcripts found for this workspace.</li>"}</ul>
+  ${showMoreButton}
   ${renderCompaction(primary)}
 
   <h2>Last 7 days</h2>
@@ -210,6 +236,16 @@ function renderHtml(sessions: PanelSessionInfo[], history: HistoryStore): string
     document.getElementById("openSettings").addEventListener("click", () => {
       vscode.postMessage({ type: "openSettings" });
     });
+    const sessionList = document.getElementById("sessionList");
+    const showMoreBtn = document.getElementById("showMoreBtn");
+    if (showMoreBtn) {
+      const moreLabel = showMoreBtn.getAttribute("data-more-label");
+      showMoreBtn.addEventListener("click", () => {
+        const expanded = sessionList.classList.toggle("expanded");
+        showMoreBtn.textContent = expanded ? "Show fewer sessions" : moreLabel;
+        vscode.postMessage({ type: "toggleSessionList", expanded });
+      });
+    }
   </script>
 </body>
 </html>`;

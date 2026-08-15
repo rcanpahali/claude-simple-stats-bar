@@ -6,19 +6,17 @@ Live Claude Code session stats — model, tokens, context left, cost — in the 
 
 ## Features
 
-- Status bar segment with current model, total tokens, context used, and estimated cost, updating live as the transcript grows.
-- Context usage shown as a `CALM`/`MED`/`WARN`/`CRIT` tag next to a matching icon (neutral below 50%, a small graph at ≥50%, a warning triangle at ≥70%, a flame at ≥90%), plus an optional 6-segment fill bar — turn the bar off with `claudeSimpleStatsBar.showContextBar` and keep just the icon, tag, and percentage.
-- Hover tooltip with the full token breakdown (input / output / cache write / cache read) and the transcript path being tracked.
-- Session panel with every session in the workspace, a 7-day spend chart, per-model spend, and a compaction count.
-- Multi-session support — auto-detects every Claude Code transcript in the workspace, with a switchable primary.
-- Configurable per-model pricing and adjustable poll interval.
+- A status bar segment shows your model, total tokens, context used, and estimated cost. It updates live as you chat.
+- Hover the segment for a full token breakdown and the transcript path.
+- Click the segment for a session panel listing every session in the workspace, a 7-day spend chart, and spend by model.
+- Pricing and poll interval are both configurable.
 
 ## Requirements
 
 - VS Code 1.90 or newer.
-- The Claude Code CLI, writing transcripts locally under `~/.claude/projects/`. This extension has no other data source — see [Where the data comes from](#where-the-data-comes-from).
+- The Claude Code CLI, writing transcripts locally under `~/.claude/projects/`. This extension has no other data source.
 
-## Claude segment, explained
+## Claude segment
 
 ![Anatomy of the Claude segment: model, total tokens, context used, estimated cost, and the four severity-tag states](docs/images/statusbar-anatomy.png)
 
@@ -35,9 +33,9 @@ Hover the segment for a per-category token breakdown and the transcript path:
 
 Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 
-![Session panel showing sessions in this workspace with last-active/ended timestamps, an Extension Settings button, a compaction note, a 7-day spend chart, and spend by model](docs/images/panel-anatomy.png)
+![Session panel showing sessions in this workspace with last-active/ended timestamps, a "Show more sessions" link, an Extension Settings button, a compaction note, a 7-day spend chart, and spend by model](docs/images/panel-anatomy.png)
 
-1. **Sessions in this workspace** — every transcript found here, with the primary one marked. Each row shows a timestamp to tell sessions apart: `last active <time>` for a still-running session, or a scaled `ended <time>` for one that's finished. Running more than one session at once? Use **Make primary**, or the **Switch Primary Session** command, to pick a different one — the pick persists across VS Code restarts.
+1. **Sessions in this workspace** — every transcript found here, with the primary one marked. Each row shows a timestamp to tell sessions apart: `last active <time>` for a still-running session, or a scaled `ended <time>` for one that's finished. Only the 6 most recent show by default — click **Show more sessions** to reveal the rest. Running more than one session at once? Use **Make primary**, or the **Switch Primary Session** command, to pick a different one — the pick persists across VS Code restarts.
 2. **Last 7 days** — a spend chart and per-model breakdown, stored locally and pruned past 7 days.
 3. **Compaction** — a heuristic count of likely compaction events.
 
