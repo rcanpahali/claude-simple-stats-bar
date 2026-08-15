@@ -1,5 +1,13 @@
 # Claude Simple Stats Bar (VS Code)
 
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/rcanpahali.claude-simple-stats-bar)](https://marketplace.visualstudio.com/items?itemName=rcanpahali.claude-simple-stats-bar)
+[![Open VSX Version](https://img.shields.io/open-vsx/v/rcanpahali/claude-simple-stats-bar)](https://open-vsx.org/extension/rcanpahali/claude-simple-stats-bar)
+[![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.90.0-blue?logo=visualstudiocode)](https://code.visualstudio.com/)
+[![License: MIT](https://img.shields.io/github/license/rcanpahali/claude-simple-stats-bar)](LICENSE)
+
+[![Sponsor](https://img.shields.io/github/sponsors/rcanpahali?logo=githubsponsors&label=Sponsor)](https://github.com/sponsors/rcanpahali)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/rcanpahali)
+
 Live Claude Code session stats — model, tokens, context left, cost — in the VS Code status bar.
 
 ![Status bar showing the Claude segment at the right edge of the window](docs/images/statusbar-hero.png)
@@ -59,8 +67,6 @@ Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 ## Where the data comes from
 
 There's no public API for Claude Code session telemetry. This extension reads the same `.jsonl` transcript files Claude Code already writes to disk, under `~/.claude/projects/<workspace-path-with-slashes-replaced-by-dashes>/<session-id>.jsonl`. It scans every folder in a (possibly multi-root) workspace for a matching directory and picks the most recently modified file as primary, re-parsing it on file changes plus a periodic poll as a fallback.
-
-This is reverse-engineered from observed transcript files, not a documented format. If Claude Code changes it, `src/claudeSession/transcriptLocator.ts` and `src/claudeSession/transcriptParser.ts` are where to look.
 
 ## Cost estimates
 
