@@ -2,6 +2,12 @@
 
 Notable changes to this extension, by version. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.1] - 2026-08-15
+
+### Added
+
+- Badge row in the README: Marketplace and Open VSX version, supported VS Code engine, license, GitHub Sponsors, and Buy Me a Coffee.
+
 ## [0.4.0] - 2026-08-15
 
 ### Added

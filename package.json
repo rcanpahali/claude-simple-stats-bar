@@ -2,7 +2,7 @@
   "name": "claude-simple-stats-bar",
   "displayName": "Claude Simple Stats Bar",
   "description": "Editor stats and live Claude Code session usage (model, tokens, cost, context %, multi-session and history) in the VS Code status bar.",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "publisher": "rcanpahali",
   "license": "MIT",
   "icon": "icon.png",
