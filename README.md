@@ -11,7 +11,7 @@ Live Claude Code session stats — model, tokens, context left, cost — in the 
 - Hover tooltip with the full token breakdown (input / output / cache write / cache read) and the transcript path being tracked.
 - Session panel with every session in the workspace, a 7-day spend chart, per-model spend, and a compaction count.
 - Multi-session support — auto-detects every Claude Code transcript in the workspace, with a switchable primary.
-- Configurable per-model pricing, adjustable poll interval, and a pinnable transcript path.
+- Configurable per-model pricing and adjustable poll interval.
 
 ## Requirements
 
@@ -35,21 +35,19 @@ Hover the segment for a per-category token breakdown and the transcript path:
 
 Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 
-![Session panel showing sessions in this workspace, a compaction note, a 7-day spend chart, and spend by model](docs/images/panel-anatomy.png)
+![Session panel showing sessions in this workspace, an Extension Settings button, a compaction note, a 7-day spend chart, and spend by model](docs/images/panel-anatomy.png)
 
-1. **Sessions in this workspace** — every transcript found here, with the primary one marked. Running more than one session at once? Use **Make primary**, or the **Switch Primary Session** command, to pick a different one.
+1. **Sessions in this workspace** — every transcript found here, with the primary one marked. Running more than one session at once? Use **Make primary**, or the **Switch Primary Session** command, to pick a different one — the pick persists across VS Code restarts.
 2. **Last 7 days** — a spend chart and per-model breakdown, stored locally and pruned past 7 days.
-3. **Compaction** — a heuristic count of likely compaction events. See [Known limitations](#known-limitations).
+3. **Compaction** — a heuristic count of likely compaction events.
 
 ## Settings
 
 | Setting | Default | What it does |
 |---|---|---|
-| `claudeSimpleStatsBar.enabled` | `true` | Show or hide the Claude segment. |
 | `claudeSimpleStatsBar.pollIntervalMs` | `2000` | How often to re-check the transcript file, alongside the file watcher. |
-| `claudeSimpleStatsBar.contextWindowTokens` | `1000000` | Context window size, used for context % and compaction detection. Lower this for a 200K-window model like Haiku 4.5. |
+| `claudeSimpleStatsBar.contextWindowTokens` | `0` | Override the context window size used for context % and compaction detection. `0` auto-detects from the model (1,000,000 for Sonnet/Opus/Fable, 200,000 for Haiku 4.5). |
 | `claudeSimpleStatsBar.showContextBar` | `true` | Show the 6-segment fill bar next to the context-usage tag. Turn off to keep just the icon, tag, and percentage. |
-| `claudeSimpleStatsBar.sessionFile` | `""` | Pin one exact transcript path — overrides auto-detection and the panel's primary-session picker. |
 | `claudeSimpleStatsBar.pricing` | `{}` | Per-model USD rates per 1M tokens; overrides or extends the built-in defaults. See [Cost estimates](#cost-estimates). |
 
 ## Commands
@@ -85,31 +83,25 @@ Built-in USD rates ship for the current Sonnet/Opus/Haiku/Fable lineup (as of 20
 
 Models with neither a built-in default nor a configured entry show cost as `n/a`.
 
-## Known limitations
-
-- **Compaction count is a heuristic.** Transcripts carry no explicit compaction marker, so this infers one from a sharp drop in per-turn context tokens: a turn using at least 10% of the context window followed by one using less than 40%. False positives and negatives are both possible.
-- **Multi-session auto-pick can grab the wrong transcript** if several sessions are running in the same workspace at once. Use the panel's **Make primary**, the **Switch Primary Session** command, or `claudeSimpleStatsBar.sessionFile` to pin the one you want.
-- **The Claude segment always sits on the far right** of the status bar, past everything VS Code or other extensions add. It uses a deliberately low priority so it doesn't compete with the built-in line/column, encoding, and language-mode indicators for space.
-
 ## Install
 
 Not on the Marketplace yet. To run it locally:
 
 **Try it without installing anything:**
 
-1. Clone the repo and open the folder in VS Code: `git clone https://github.com/rcanpahali/vscode-claude-statusline.git`
+1. Clone the repo and open the folder in VS Code: `git clone https://github.com/rcanpahali/claude-simple-stats-bar.git`
 2. Press `F5` — this compiles the extension and opens an Extension Development Host window with it loaded.
 3. Open any folder in that new window; the Claude segment appears bottom-right.
 
 **Install it into your real VS Code:**
 
 ```bash
-git clone https://github.com/rcanpahali/vscode-claude-statusline.git
-cd vscode-claude-statusline
+git clone https://github.com/rcanpahali/claude-simple-stats-bar.git
+cd claude-simple-stats-bar
 npm install
 npm run compile
 npx @vscode/vsce package
-code --install-extension vscode-claude-statusline-0.3.0.vsix
+code --install-extension claude-simple-stats-bar-0.3.0.vsix
 ```
 
 Then reload the window (`Cmd+Shift+P` → "Developer: Reload Window"). After code changes, repeat the last two commands to update it.

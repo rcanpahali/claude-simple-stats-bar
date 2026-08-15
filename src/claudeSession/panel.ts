@@ -1,10 +1,11 @@
 import * as vscode from "vscode";
-import * as path from "path";
 import { UsageTotals } from "./transcriptParser";
 import { HistoryStore } from "./history";
 
 export interface PanelSessionInfo {
   file: string;
+  /** Friendly session name from the running CLI process, or the transcript's session id if none was found. */
+  name: string;
   usage: UsageTotals;
   cost: number | undefined;
   isPrimary: boolean;
@@ -38,6 +39,8 @@ export class ClaudeSessionPanel implements vscode.Disposable {
     this.panel.webview.onDidReceiveMessage((message) => {
       if (message?.type === "switchPrimary" && typeof message.file === "string") {
         this.onSwitchPrimary(message.file);
+      } else if (message?.type === "openSettings") {
+        vscode.commands.executeCommand("workbench.action.openSettings", "@ext:rcanpahali.claude-simple-stats-bar");
       }
     });
   }
@@ -63,7 +66,6 @@ function formatTokenCount(n: number): string {
 }
 
 function renderSessionRow(s: PanelSessionInfo): string {
-  const name = path.basename(s.file, ".jsonl");
   const total =
     s.usage.inputTokens + s.usage.outputTokens + s.usage.cacheCreationTokens + s.usage.cacheReadTokens;
   const costLabel = s.cost === undefined ? "n/a" : `$${s.cost.toFixed(3)}`;
@@ -71,7 +73,7 @@ function renderSessionRow(s: PanelSessionInfo): string {
   return `
     <li class="session${s.isPrimary ? " primary" : ""}">
       <span class="dot">${s.isPrimary ? "●" : "○"}</span>
-      <span class="name" title="${esc(s.file)}">${esc(name)}</span>
+      <span class="name" title="${esc(s.file)}">${esc(s.name)}</span>
       <span class="model">${esc(s.usage.model ?? "unknown")}</span>
       <span class="tokens">${formatTokenCount(total)} tok</span>
       <span class="cost">${costLabel}</span>
@@ -164,6 +166,9 @@ function renderHtml(sessions: PanelSessionInfo[], history: HistoryStore): string
 <meta charset="UTF-8" />
 <style>
   body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); background: var(--vscode-editor-background); padding: 16px; }
+  .toolbar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+  button.settings { background: transparent; color: var(--vscode-foreground); border: 1px solid var(--vscode-button-border, #5a5a5a); padding: 3px 10px; border-radius: 3px; cursor: pointer; font-size: 0.85em; }
+  button.settings:hover { background: var(--vscode-toolbar-hoverBackground, #2a2d2e); }
   h2 { font-size: 1.1em; margin-top: 24px; margin-bottom: 8px; }
   ul { list-style: none; padding: 0; margin: 0; }
   li.session { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--vscode-widget-border, #444); }
@@ -180,6 +185,9 @@ function renderHtml(sessions: PanelSessionInfo[], history: HistoryStore): string
 </style>
 </head>
 <body>
+  <div class="toolbar">
+    <button class="settings" id="openSettings">&#9881; Extension Settings</button>
+  </div>
   <h2>Sessions (this workspace)</h2>
   <ul>${rows || "<li>No Claude Code session transcripts found for this workspace.</li>"}</ul>
   ${renderCompaction(primary)}
@@ -196,6 +204,9 @@ function renderHtml(sessions: PanelSessionInfo[], history: HistoryStore): string
       btn.addEventListener("click", () => {
         vscode.postMessage({ type: "switchPrimary", file: btn.getAttribute("data-file") });
       });
+    });
+    document.getElementById("openSettings").addEventListener("click", () => {
+      vscode.postMessage({ type: "openSettings" });
     });
   </script>
 </body>

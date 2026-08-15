@@ -1,5 +1,5 @@
 {
-  "name": "vscode-claude-statusline",
+  "name": "claude-simple-stats-bar",
   "displayName": "Claude Simple Stats Bar",
   "description": "Editor stats and live Claude Code session usage (model, tokens, cost, context %, multi-session and history) in the VS Code status bar.",
   "version": "0.3.0",
@@ -8,7 +8,7 @@
   "icon": "icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rcanpahali/vscode-claude-statusline.git"
+    "url": "https://github.com/rcanpahali/claude-simple-stats-bar.git"
   },
   "engines": {
     "vscode": "^1.90.0"
@@ -34,35 +34,25 @@
     "configuration": {
       "title": "Claude Simple Stats Bar",
       "properties": {
-        "claudeSimpleStatsBar.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Show the Claude Code session status bar item."
-        },
         "claudeSimpleStatsBar.pollIntervalMs": {
           "type": "number",
           "default": 2000,
-          "description": "How often to re-check the transcript file in addition to the file watcher, in milliseconds."
+          "description": "Fallback poll interval (ms), alongside the file watcher."
         },
         "claudeSimpleStatsBar.contextWindowTokens": {
           "type": "number",
-          "default": 1000000,
-          "description": "Context window size (in tokens) used to estimate the context-usage percentage shown in the status bar and to calibrate compaction detection. Defaults to 1,000,000 (current Sonnet/Opus/Fable models); lower this if you're on a 200K-window model like Haiku 4.5."
+          "default": 0,
+          "description": "Override the model's context window in tokens, for the context-usage % and compaction detection. Leave at 0 to auto-detect from the model (1,000,000 for Sonnet/Opus/Fable, 200,000 for Haiku 4.5)."
         },
         "claudeSimpleStatsBar.showContextBar": {
           "type": "boolean",
           "default": true,
-          "description": "Show the 6-segment fill bar next to the context-usage tag (CALM/MED/WARN/CRIT). Turn off to keep the icon, tag, and percentage without the bar."
-        },
-        "claudeSimpleStatsBar.sessionFile": {
-          "type": "string",
-          "default": "",
-          "description": "Absolute path to a specific Claude Code .jsonl transcript to track. Takes priority over both auto-detection and the 'Switch Primary Session' command. Leave empty to auto-detect the most recently modified session for the current workspace under ~/.claude/projects/."
+          "description": "Show the 6-segment fill bar next to the context-usage tag. Off keeps just the icon, tag, and percentage."
         },
         "claudeSimpleStatsBar.pricing": {
           "type": "object",
           "default": {},
-          "description": "USD price per 1,000,000 tokens, keyed by model id, e.g. { \"claude-sonnet-5\": { \"inputPerMillion\": 3, \"outputPerMillion\": 15, \"cacheWritePerMillion\": 3.75, \"cacheReadPerMillion\": 0.3 } }. Built-in default rates ship for the current Sonnet/Opus/Haiku/Fable models; entries here override or add to those defaults. Verify current Anthropic pricing before configuring a custom entry, since the extension does not fetch or guess rates. Models with no default and no configured entry show cost as n/a."
+          "description": "USD per 1M tokens, keyed by model id, e.g. { \"claude-sonnet-5\": { \"inputPerMillion\": 3, \"outputPerMillion\": 15, \"cacheWritePerMillion\": 3.75, \"cacheReadPerMillion\": 0.3 } }. Overrides built-in defaults for Sonnet/Opus/Haiku/Fable. Unlisted models with no entry show cost as n/a."
         }
       }
     }

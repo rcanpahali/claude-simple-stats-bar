@@ -185,6 +185,10 @@
 
   .panel-stage { background: #1e1e1e; border-radius: 8px; padding: 16px 20px 20px; }
   .panel-body { color: #cccccc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .panel-body .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .panel-body h1 { font-size: 1.3em; color: #ffffff; margin: 0; font-weight: 700; }
+  .panel-body button.settings { background: transparent; color: #cccccc; border: 1px solid #5a5a5a; padding: 3px 10px; border-radius: 3px; cursor: pointer; font-size: 0.85em; }
+  .panel-body button.settings:hover { background: #2a2d2e; color: #ffffff; }
   .panel-body h2 { font-size: 1.1em; color: #ffffff; margin: 0 0 8px; }
   .panel-body h2 + h2, .panel-body .compaction + h2 { margin-top: 24px; }
   .panel-body ul { list-style: none; padding: 0; margin: 0; }
@@ -264,18 +268,22 @@
   <div class="panel" id="panel-panel">
     <div class="panel-stage">
       <div class="panel-body">
+        <div class="panel-header">
+          <h1>Usage Summary</h1>
+          <button class="settings">&#9881; Extension Settings</button>
+        </div>
         <h2>Sessions (this workspace)</h2>
         <ul>
           <li class="session primary">
             <span class="dot">&#9679;</span>
-            <span class="name">1a2b3c4d-5e6f-4a1b-9c3d-7f8e9a0b1c2d</span>
+            <span class="name">storefront-82</span>
             <span class="model">claude-sonnet-5</span>
             <span class="tokens">7.4M tok</span>
             <span class="cost">$3.687</span>
           </li>
           <li class="session">
             <span class="dot">&#9675;</span>
-            <span class="name">9f1e2d3c-4b5a-6978-8f01-2a3b4c5d6e7f</span>
+            <span class="name">storefront-a8</span>
             <span class="model">claude-opus-5</span>
             <span class="tokens">1.2M tok</span>
             <span class="cost">$5.210</span>
@@ -283,7 +291,7 @@
           </li>
           <li class="session">
             <span class="dot">&#9675;</span>
-            <span class="name">55667788-99aa-4bbb-8ccc-ddeeff001122</span>
+            <span class="name">55667788 &middot; ended at 2:15 PM</span>
             <span class="model">claude-haiku-4.5</span>
             <span class="tokens">340k tok</span>
             <span class="cost">$0.184</span>
@@ -291,7 +299,7 @@
           </li>
           <li class="session">
             <span class="dot">&#9675;</span>
-            <span class="name">b3c4d5e6-f7a8-49b0-8c1d-2e3f4a5b6c7d</span>
+            <span class="name">b3c4d5e6 &middot; ended at 11:47 AM</span>
             <span class="model">claude-opus-5</span>
             <span class="tokens">2.8M tok</span>
             <span class="cost">$1.932</span>
@@ -299,7 +307,7 @@
           </li>
           <li class="session">
             <span class="dot">&#9675;</span>
-            <span class="name">de305d54-75b4-431b-adb2-eb6b9e546013</span>
+            <span class="name">de305d54 &middot; ended at 9:03 AM</span>
             <span class="model">claude-sonnet-5</span>
             <span class="tokens">615k tok</span>
             <span class="cost">$0.402</span>

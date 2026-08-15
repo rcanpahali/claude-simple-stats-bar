@@ -5,6 +5,7 @@ import { parseTranscript, UsageTotals } from "./transcriptParser";
 import { estimateCostUsd, ModelPricing, resolvePricing } from "./pricing";
 import { SessionManager } from "./sessionManager";
 import { ClaudeSessionPanel, PanelSessionInfo } from "./panel";
+import { fallbackSessionLabel, loadSessionNames, shortSessionId } from "./sessionNames";
 import { formatLocalDate, HistoryStore, loadHistory, pruneOldDays, recordUsage, saveHistory } from "./history";
 
 function formatTokenCount(n: number): string {
@@ -35,7 +36,7 @@ function contextSeverity(pct: number): ContextSeverity {
 
 export class ClaudeSessionStatusBar implements vscode.Disposable {
   private readonly item: vscode.StatusBarItem;
-  private readonly sessionManager = new SessionManager();
+  private readonly sessionManager: SessionManager;
   private readonly panel: ClaudeSessionPanel;
   private readonly historyStorageDir?: string;
   private readonly historyStore: HistoryStore;
@@ -45,7 +46,8 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
   private currentFile?: string;
   private lastUsage?: UsageTotals;
 
-  private contextWindowTokens = 1_000_000;
+  /** 0 means "auto-detect from the model" — see `contextWindow.ts`. */
+  private contextWindowTokens = 0;
   private pollIntervalMs = 2000;
   private pricing: Record<string, ModelPricing> = {};
   private showContextBar = true;
@@ -57,6 +59,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
     );
     this.item.command = "claudeSimpleStatsBar.openPanel";
 
+    this.sessionManager = new SessionManager(context.workspaceState);
     this.panel = new ClaudeSessionPanel((file) => {
       this.sessionManager.setManualPrimary(file);
       this.refresh();
@@ -72,7 +75,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
 
   reloadConfig(): void {
     const cfg = vscode.workspace.getConfiguration("claudeSimpleStatsBar");
-    this.contextWindowTokens = cfg.get<number>("contextWindowTokens", 1_000_000);
+    this.contextWindowTokens = cfg.get<number>("contextWindowTokens", 0);
     this.pricing = resolvePricing(cfg.get<Record<string, ModelPricing>>("pricing", {}));
     this.showContextBar = cfg.get<boolean>("showContextBar", true);
 
@@ -83,10 +86,6 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
       this.pollTimer = setInterval(() => this.refresh(), this.pollIntervalMs);
     }
 
-    if (!cfg.get<boolean>("enabled", true)) {
-      this.item.hide();
-      return;
-    }
     this.item.show();
     this.refresh();
   }
@@ -104,9 +103,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
   }
 
   refresh(): void {
-    const cfg = vscode.workspace.getConfiguration("claudeSimpleStatsBar");
-    const pinnedFile = cfg.get<string>("sessionFile", "").trim() || undefined;
-    const primary = this.sessionManager.resolvePrimary(pinnedFile);
+    const primary = this.sessionManager.resolvePrimary();
 
     if (!primary) {
       this.watcher?.close();
@@ -130,13 +127,10 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
       usage.cacheCreationTokens +
       usage.cacheReadTokens;
 
-    const contextPct =
-      this.contextWindowTokens > 0
-        ? Math.min(
-            100,
-            Math.round((usage.lastTurnInputTokens / this.contextWindowTokens) * 100)
-          )
-        : 0;
+    const contextPct = Math.min(
+      100,
+      Math.round((usage.lastTurnInputTokens / usage.contextWindowTokens) * 100)
+    );
 
     const cost = estimateCostUsd(usage, this.pricing);
     const costLabel = cost === undefined ? "n/a" : `$${cost.toFixed(3)}`;
@@ -158,6 +152,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
   private updateSessionsAndHistory(primaryFile: string): void {
     const sessions = this.sessionManager.listSessions();
     const today = formatLocalDate(new Date());
+    const sessionNames = loadSessionNames();
     const panelSessions: PanelSessionInfo[] = [];
 
     for (const s of sessions) {
@@ -166,7 +161,9 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
           ? this.lastUsage
           : parseTranscript(s.file, this.contextWindowTokens);
       const cost = estimateCostUsd(usage, this.pricing);
-      panelSessions.push({ file: s.file, usage, cost, isPrimary: s.file === primaryFile });
+      const sessionId = path.basename(s.file, ".jsonl");
+      const name = sessionNames.get(sessionId) ?? fallbackSessionLabel(sessionId, s.mtimeMs);
+      panelSessions.push({ file: s.file, name, usage, cost, isPrimary: s.file === primaryFile });
 
       if (this.historyStorageDir) {
         recordUsage(this.historyStore, s.file, usage, cost, today);
@@ -227,11 +224,15 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
       return;
     }
 
-    const items = sessions.map((s) => ({
-      label: path.basename(s.file, ".jsonl"),
-      description: new Date(s.mtimeMs).toLocaleString(),
-      file: s.file,
-    }));
+    const sessionNames = loadSessionNames();
+    const items = sessions.map((s) => {
+      const sessionId = path.basename(s.file, ".jsonl");
+      return {
+        label: sessionNames.get(sessionId) ?? shortSessionId(sessionId),
+        description: new Date(s.mtimeMs).toLocaleString(),
+        file: s.file,
+      };
+    });
 
     const picked = await vscode.window.showQuickPick(items, {
       placeHolder: "Select the session to treat as primary",

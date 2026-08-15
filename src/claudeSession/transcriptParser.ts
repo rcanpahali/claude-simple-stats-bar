@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import { resolveContextWindowTokens } from "./contextWindow";
 
 export interface UsageTotals {
   model?: string;
@@ -8,19 +9,22 @@ export interface UsageTotals {
   cacheReadTokens: number;
   /** input + cache tokens attributed to the most recent assistant turn, used to estimate context-window usage. */
   lastTurnInputTokens: number;
+  /** Context window size actually used for this transcript: the configured override, or auto-detected from `model`. */
+  contextWindowTokens: number;
   /** Number of likely compaction events detected in this transcript (heuristic — see parseTranscript). */
   compactionCount: number;
   /** ISO timestamp of the most recent likely compaction event, if any. */
   lastCompactionTimestamp?: string;
 }
 
-function emptyTotals(): UsageTotals {
+function emptyTotals(contextWindowTokens: number): UsageTotals {
   return {
     inputTokens: 0,
     outputTokens: 0,
     cacheCreationTokens: 0,
     cacheReadTokens: 0,
     lastTurnInputTokens: 0,
+    contextWindowTokens,
     compactionCount: 0,
   };
 }
@@ -44,9 +48,9 @@ const COMPACTION_MIN_WINDOW_FRACTION = 0.1;
  */
 export function parseTranscript(
   filePath: string,
-  contextWindowTokens = 1_000_000
+  contextWindowOverride?: number
 ): UsageTotals {
-  const totals = emptyTotals();
+  const totals = emptyTotals(resolveContextWindowTokens(undefined, contextWindowOverride));
 
   let raw: string;
   try {
@@ -93,7 +97,9 @@ export function parseTranscript(
     }
   }
 
-  const minPriorTokens = contextWindowTokens * COMPACTION_MIN_WINDOW_FRACTION;
+  totals.contextWindowTokens = resolveContextWindowTokens(totals.model, contextWindowOverride);
+
+  const minPriorTokens = totals.contextWindowTokens * COMPACTION_MIN_WINDOW_FRACTION;
   for (let i = 1; i < turnTokens.length; i++) {
     const prev = turnTokens[i - 1];
     const curr = turnTokens[i];
