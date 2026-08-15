@@ -35,9 +35,9 @@ Hover the segment for a per-category token breakdown and the transcript path:
 
 Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 
-![Session panel showing sessions in this workspace, an Extension Settings button, a compaction note, a 7-day spend chart, and spend by model](docs/images/panel-anatomy.png)
+![Session panel showing sessions in this workspace with last-active/ended timestamps, an Extension Settings button, a compaction note, a 7-day spend chart, and spend by model](docs/images/panel-anatomy.png)
 
-1. **Sessions in this workspace** — every transcript found here, with the primary one marked. Running more than one session at once? Use **Make primary**, or the **Switch Primary Session** command, to pick a different one — the pick persists across VS Code restarts.
+1. **Sessions in this workspace** — every transcript found here, with the primary one marked. Each row shows a timestamp to tell sessions apart: `last active <time>` for a still-running session, or a scaled `ended <time>` for one that's finished. Running more than one session at once? Use **Make primary**, or the **Switch Primary Session** command, to pick a different one — the pick persists across VS Code restarts.
 2. **Last 7 days** — a spend chart and per-model breakdown, stored locally and pruned past 7 days.
 3. **Compaction** — a heuristic count of likely compaction events.
 
