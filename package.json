@@ -60,7 +60,8 @@
   "scripts": {
     "compile": "tsc -p ./",
     "watch": "tsc -w -p ./",
-    "screenshot": "node scripts/screenshot-prototype.mjs"
+    "screenshot": "node scripts/screenshot-prototype.mjs",
+    "package": "rm -f *.vsix && npm run compile && npx @vscode/vsce package"
   },
   "devDependencies": {
     "@types/vscode": "^1.90.0",

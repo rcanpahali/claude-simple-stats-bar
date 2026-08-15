@@ -97,12 +97,11 @@ Search for **Claude Simple Stats Bar** in the VS Code Extensions view, or instal
 git clone https://github.com/rcanpahali/claude-simple-stats-bar.git
 cd claude-simple-stats-bar
 npm install
-npm run compile
-npx @vscode/vsce package
-code --install-extension claude-simple-stats-bar-0.4.0.vsix
+npm run package
+code --install-extension claude-simple-stats-bar-*.vsix
 ```
 
-Then reload the window (`Cmd+Shift+P` → "Developer: Reload Window"). After code changes, repeat the last two commands to update it.
+Then reload the window (`Cmd+Shift+P` → "Developer: Reload Window"). After code changes, run `npm run package` again (it removes the old `.vsix` before rebuilding) followed by the install command.
 
 Or press `F5` from a clone to compile and open an Extension Development Host window with it loaded, without installing anything.
 
