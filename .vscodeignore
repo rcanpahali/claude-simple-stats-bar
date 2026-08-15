@@ -2,6 +2,7 @@
 src/**
 tsconfig.json
 .gitignore
+CLAUDE.md
 **/*.map
 docs/images/*.svg
 prototypes/**

@@ -85,15 +85,9 @@ Models with neither a built-in default nor a configured entry show cost as `n/a`
 
 ## Install
 
-Not on the Marketplace yet. To run it locally:
+Search for **Claude Simple Stats Bar** in the VS Code Extensions view, or install from the [Marketplace listing](https://marketplace.visualstudio.com/items?itemName=rcanpahali.claude-simple-stats-bar).
 
-**Try it without installing anything:**
-
-1. Clone the repo and open the folder in VS Code: `git clone https://github.com/rcanpahali/claude-simple-stats-bar.git`
-2. Press `F5` — this compiles the extension and opens an Extension Development Host window with it loaded.
-3. Open any folder in that new window; the Claude segment appears bottom-right.
-
-**Install it into your real VS Code:**
+**Or build it from source:**
 
 ```bash
 git clone https://github.com/rcanpahali/claude-simple-stats-bar.git
@@ -101,10 +95,12 @@ cd claude-simple-stats-bar
 npm install
 npm run compile
 npx @vscode/vsce package
-code --install-extension claude-simple-stats-bar-0.3.0.vsix
+code --install-extension claude-simple-stats-bar-0.4.0.vsix
 ```
 
 Then reload the window (`Cmd+Shift+P` → "Developer: Reload Window"). After code changes, repeat the last two commands to update it.
+
+Or press `F5` from a clone to compile and open an Extension Development Host window with it loaded, without installing anything.
 
 ## Changelog
 
