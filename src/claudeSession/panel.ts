@@ -166,7 +166,8 @@ function renderHtml(sessions: PanelSessionInfo[], history: HistoryStore): string
 <meta charset="UTF-8" />
 <style>
   body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); background: var(--vscode-editor-background); padding: 16px; }
-  .toolbar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+  .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .toolbar h1 { font-size: 1.3em; margin: 0; font-weight: 700; }
   button.settings { background: transparent; color: var(--vscode-foreground); border: 1px solid var(--vscode-button-border, #5a5a5a); padding: 3px 10px; border-radius: 3px; cursor: pointer; font-size: 0.85em; }
   button.settings:hover { background: var(--vscode-toolbar-hoverBackground, #2a2d2e); }
   h2 { font-size: 1.1em; margin-top: 24px; margin-bottom: 8px; }
@@ -186,6 +187,7 @@ function renderHtml(sessions: PanelSessionInfo[], history: HistoryStore): string
 </head>
 <body>
   <div class="toolbar">
+    <h1>Usage Summary</h1>
     <button class="settings" id="openSettings">&#9881; Extension Settings</button>
   </div>
   <h2>Sessions (this workspace)</h2>

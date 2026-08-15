@@ -51,5 +51,5 @@ export function shortSessionId(sessionId: string): string {
  */
 export function fallbackSessionLabel(sessionId: string, mtimeMs: number): string {
   const time = new Date(mtimeMs).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  return `${shortSessionId(sessionId)} · ${time}`;
+  return `${shortSessionId(sessionId)} · ended at ${time}`;
 }
