@@ -19,6 +19,7 @@ Notable changes to this extension, by version. Format follows [Keep a Changelog]
 - `claudeSimpleStatsBar.contextWindowTokens` now defaults to `0`, which auto-detects the context window from the transcript's model (1,000,000 for Sonnet/Opus/Fable, 200,000 for Haiku 4.5) instead of always assuming 1,000,000; set it to a nonzero value to override.
 - "Switch Primary Session" (and the panel's "Make primary") now persists the pinned session in workspace state, surviving a VS Code restart.
 - Trimmed settings descriptions for brevity.
+- Session panel rows now show a timestamp next to the name to distinguish concurrent or same-named sessions: `last active <time>` for sessions with a live CLI process, and a scaled `ended <time>` for those without one — a clock time today, "yesterday" plus a clock time, or a full date with weekday (and year, if not this year).
 
 ### Removed
 

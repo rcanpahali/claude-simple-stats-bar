@@ -5,7 +5,7 @@ import { parseTranscript, UsageTotals } from "./transcriptParser";
 import { estimateCostUsd, ModelPricing, resolvePricing } from "./pricing";
 import { SessionManager } from "./sessionManager";
 import { ClaudeSessionPanel, PanelSessionInfo } from "./panel";
-import { fallbackSessionLabel, loadSessionNames, shortSessionId } from "./sessionNames";
+import { activeSessionLabel, fallbackSessionLabel, loadSessionNames, shortSessionId } from "./sessionNames";
 import { formatLocalDate, HistoryStore, loadHistory, pruneOldDays, recordUsage, saveHistory } from "./history";
 
 function formatTokenCount(n: number): string {
@@ -162,7 +162,8 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
           : parseTranscript(s.file, this.contextWindowTokens);
       const cost = estimateCostUsd(usage, this.pricing);
       const sessionId = path.basename(s.file, ".jsonl");
-      const name = sessionNames.get(sessionId) ?? fallbackSessionLabel(sessionId, s.mtimeMs);
+      const liveName = sessionNames.get(sessionId);
+      const name = liveName ? activeSessionLabel(liveName, s.mtimeMs) : fallbackSessionLabel(sessionId, s.mtimeMs);
       panelSessions.push({ file: s.file, name, usage, cost, isPrimary: s.file === primaryFile });
 
       if (this.historyStorageDir) {

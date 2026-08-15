@@ -45,11 +45,46 @@ export function shortSessionId(sessionId: string): string {
   return sessionId.slice(0, 8);
 }
 
+function isSameCalendarDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+function formatTime(d: Date): string {
+  return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+/** Label for a session still running under a live CLI process — see loadSessionNames. */
+export function activeSessionLabel(name: string, mtimeMs: number): string {
+  return `${name} · last active ${formatTime(new Date(mtimeMs))}`;
+}
+
 /**
  * Label for a session with no live/derived name (its CLI process has already
  * exited, so no friendly name was ever recoverable — see loadSessionNames).
+ * Scales with how long ago it ended: a clock time today, "yesterday" plus a
+ * clock time, or a full date (with weekday, and year if not this year).
  */
 export function fallbackSessionLabel(sessionId: string, mtimeMs: number): string {
-  const time = new Date(mtimeMs).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  return `${shortSessionId(sessionId)} · ended at ${time}`;
+  const ended = new Date(mtimeMs);
+  const now = new Date();
+  const id = shortSessionId(sessionId);
+
+  if (isSameCalendarDay(ended, now)) {
+    return `${id} · ended at ${formatTime(ended)}`;
+  }
+
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (isSameCalendarDay(ended, yesterday)) {
+    return `${id} · ended yesterday at ${formatTime(ended)}`;
+  }
+
+  const monthDay = ended.toLocaleDateString([], { month: "long", day: "numeric" });
+  const weekday = ended.toLocaleDateString([], { weekday: "short" });
+  const dateLabel =
+    ended.getFullYear() === now.getFullYear()
+      ? `${monthDay}, ${weekday}`
+      : `${monthDay}, ${ended.getFullYear()}, ${weekday}`;
+
+  return `${id} · ended on ${dateLabel}`;
 }
