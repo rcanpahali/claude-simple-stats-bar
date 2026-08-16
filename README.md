@@ -10,7 +10,7 @@
 
 Live Claude Code session stats — model, tokens, context left, cost — in the VS Code status bar.
 
-![Status bar showing the Claude segment at the right edge of the window](docs/images/statusbar-hero.png)
+![The Claude segment: model, total tokens, context used, and estimated cost](docs/images/statusbar-hero.png)
 
 ## Features
 
@@ -53,7 +53,7 @@ Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 |---|---|---|
 | `claudeSimpleStatsBar.pollIntervalMs` | `2000` | How often to re-check the transcript file, alongside the file watcher. |
 | `claudeSimpleStatsBar.contextWindowTokens` | `0` | Override the context window size used for context % and compaction detection. `0` auto-detects from the model (1,000,000 for Sonnet/Opus/Fable, 200,000 for Haiku 4.5). |
-| `claudeSimpleStatsBar.showContextBar` | `true` | Show the 6-segment fill bar next to the context-usage tag. Turn off to keep just the icon, tag, and percentage. |
+| `claudeSimpleStatsBar.showContextBar` | `false` | Show the 6-segment fill bar next to the context-usage tag. Off by default; turn on to add the bar back next to the icon, tag, and percentage. |
 | `claudeSimpleStatsBar.pricing` | `{}` | Per-model USD rates per 1M tokens; overrides or extends the built-in defaults. See [Cost estimates](#cost-estimates). |
 
 ## Commands

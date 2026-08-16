@@ -50,20 +50,24 @@
   p.sub { font-size: 13.5px; color: var(--muted); margin: 0 0 32px; line-height: 1.5; }
   p.sub code { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; background: var(--line); padding: 1px 5px; border-radius: 3px; }
 
-  .barwrap { margin-bottom: 18px; }
+  .barwrap {
+    margin-bottom: 18px;
+    background: #007ACC;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
 
   .vsbar {
-    background: #007ACC;
     color: #FFFFFF;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", Ubuntu, sans-serif;
     font-size: 12px;
     line-height: 22px;
-    height: 22px;
     padding: 0 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 100%;
   }
   .ic { font-family: 'codicon'; font-size: 14px; margin-right: 4px; line-height: 1; vertical-align: -3px; }
 
@@ -178,13 +182,10 @@
     height: 22px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     padding: 0 10px;
     white-space: nowrap;
   }
-  .tooltip-bar .left, .tooltip-bar .right { display: flex; align-items: center; }
-  .tooltip-bar .seg { display: flex; align-items: center; margin-right: 14px; }
-  .tooltip-bar .right .seg { margin-right: 0; margin-left: 14px; }
 
   .panel-stage { background: #1e1e1e; border-radius: 8px; padding: 16px 20px 20px; }
   .panel-body { color: #cccccc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -254,19 +255,8 @@
         <p class="foot">Click for the full session panel (all sessions, 7-day history).</p>
       </div>
       <div class="tooltip-bar">
-        <div class="left">
-          <div class="seg">05:20:06</div>
-          <div class="seg"><span class="ic">&#xea7b;</span>no file</div>
-        </div>
         <div class="right">
-          <div class="seg"><span class="ic">&#xeacd;</span>claude-sonnet-5</div>
-          <div class="seg">&middot;</div>
-          <div class="seg"><span class="ic">&#xeb31;</span>7.4M tok</div>
-          <div class="seg">&middot;</div>
-          <div class="seg"><span class="ic" id="icon-mini">&#xeb08;</span><span id="tag-mini">CALM </span><span id="fill-mini">▮▮▮▯▯▯</span><span id="gap-mini">&nbsp;&nbsp;</span><span id="pct-mini">45</span>% ctx</div>
-          <div class="seg">&middot;</div>
-          <div class="seg"><span class="ic">&#xeac9;</span>$3.687</div>
-          <div class="seg"><span class="ic">&#xeb9a;</span></div>
+          <span class="ic">&#xeacd;</span>claude-sonnet-5 &middot; <span class="ic">&#xeb31;</span>7.4M tok &middot; <span class="ic" id="icon-mini">&#xeb08;</span><span id="tag-mini">CALM </span><span id="fill-mini">▮▮▮▯▯▯</span><span id="gap-mini">&nbsp;&nbsp;</span><span id="pct-mini">45</span>% ctx &middot; <span class="ic">&#xeac9;</span>$3.687
         </div>
       </div>
     </div>
@@ -427,8 +417,8 @@
         <span class="mark" style="left:90%"></span><span style="left:90%">90</span>
       </div>
       <label class="toggle-row">
-        <input type="checkbox" id="showBar" checked />
-        Show context bar <span class="toggle-hint">(new <code>claudeSimpleStatsBar.showContextBar</code> setting &mdash; unchecked keeps the icon, tag, and percentage, just drops the bar)</span>
+        <input type="checkbox" id="showBar" />
+        Show context bar <span class="toggle-hint">(<code>claudeSimpleStatsBar.showContextBar</code> setting, now defaulting to off &mdash; unchecked keeps the icon, tag, and percentage, just drops the bar)</span>
       </label>
     </div>
 

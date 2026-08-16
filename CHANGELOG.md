@@ -2,6 +2,12 @@
 
 Notable changes to this extension, by version. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.2] - 2026-08-16
+
+### Changed
+
+- `claudeSimpleStatsBar.showContextBar` now defaults to `false`, so the context-usage segment shows just the icon, tag, and percentage out of the box. Turn it on to bring the 6-segment fill bar back.
+
 ## [0.4.1] - 2026-08-15
 
 ### Added

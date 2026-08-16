@@ -2,7 +2,7 @@
   "name": "claude-simple-stats-bar",
   "displayName": "Claude Simple Stats Bar",
   "description": "Editor stats and live Claude Code session usage (model, tokens, cost, context %, multi-session and history) in the VS Code status bar.",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "publisher": "rcanpahali",
   "license": "MIT",
   "icon": "icon.png",
@@ -46,8 +46,8 @@
         },
         "claudeSimpleStatsBar.showContextBar": {
           "type": "boolean",
-          "default": true,
-          "description": "Show the 6-segment fill bar next to the context-usage tag. Off keeps just the icon, tag, and percentage."
+          "default": false,
+          "description": "Show the 6-segment fill bar next to the context-usage tag. Off (default) keeps just the icon, tag, and percentage."
         },
         "claudeSimpleStatsBar.pricing": {
           "type": "object",
