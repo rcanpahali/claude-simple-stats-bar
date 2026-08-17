@@ -2,6 +2,16 @@
 
 Notable changes to this extension, by version. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.3] - 2026-08-17
+
+### Changed
+
+- Updated `claude-sonnet-5` default pricing to $2/$10 per million input/output tokens (from $3/$15).
+
+### Fixed
+
+- The "Last 7 days" chart and "Spend by model" breakdown in the session panel now attribute each turn's cost to the calendar day it actually happened on (read from the transcript's own per-turn timestamp), instead of the day the extension first observed it. Previously, any transcript predating the extension's tracking of it — a fresh install, or a workspace whose history file had gone missing — had its entire lifetime spend dumped onto "today," while the days that spend actually happened on showed $0.00. Existing `history.json` files from before this fix are discarded once and rebuilt from transcripts on next launch.
+
 ## [0.4.2] - 2026-08-16
 
 ### Changed
