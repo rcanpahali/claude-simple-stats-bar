@@ -1,5 +1,3 @@
-import { UsageTotals } from "./transcriptParser";
-
 export interface ModelPricing {
   inputPerMillion: number;
   outputPerMillion: number;
@@ -16,10 +14,10 @@ export interface ModelPricing {
  */
 export const DEFAULT_PRICING: Record<string, ModelPricing> = {
   "claude-sonnet-5": {
-    inputPerMillion: 3,
-    outputPerMillion: 15,
-    cacheWritePerMillion: 3.75,
-    cacheReadPerMillion: 0.3,
+    inputPerMillion: 2,
+    outputPerMillion: 10,
+    cacheWritePerMillion: 2.5,
+    cacheReadPerMillion: 0.2,
   },
   "claude-opus-5": {
     inputPerMillion: 5,
@@ -54,8 +52,16 @@ export function resolvePricing(
   return { ...DEFAULT_PRICING, ...userPricing };
 }
 
+export interface TokenUsageLike {
+  model?: string;
+  inputTokens: number;
+  outputTokens: number;
+  cacheCreationTokens: number;
+  cacheReadTokens: number;
+}
+
 export function estimateCostUsd(
-  usage: UsageTotals,
+  usage: TokenUsageLike,
   pricing: Record<string, ModelPricing>
 ): number | undefined {
   if (!usage.model) return undefined;

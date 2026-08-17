@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
-import { UsageTotals } from "./transcriptParser";
+import { TranscriptTurn } from "./transcriptParser";
+import { estimateCostUsd, ModelPricing } from "./pricing";
 
 export interface DailyModelTotals {
   cost: number;
@@ -11,15 +12,12 @@ export interface DailyModelTotals {
 }
 
 interface FileWatermark {
-  cost: number;
-  inputTokens: number;
-  outputTokens: number;
-  cacheCreationTokens: number;
-  cacheReadTokens: number;
+  /** Number of turns already attributed to `daily`, so re-parsing a growing transcript only records the new ones. */
+  turnsRecorded: number;
 }
 
 export interface HistoryStore {
-  /** Last-seen cumulative usage per transcript file, used to compute per-refresh deltas. */
+  /** Per-transcript-file watermark, used to only attribute newly-appeared turns on each refresh. */
   fileWatermarks: Record<string, FileWatermark>;
   /** daily[YYYY-MM-DD][model] = totals accrued that day. */
   daily: Record<string, Record<string, DailyModelTotals>>;
@@ -28,12 +26,18 @@ export interface HistoryStore {
 const HISTORY_FILE_NAME = "history.json";
 export const HISTORY_RETENTION_DAYS = 7;
 
+/**
+ * Bumped whenever the on-disk shape changes in a way older code can't read.
+ * v2 switched from cumulative usage watermarks to a per-turn-count watermark
+ * (see `recordTranscriptUsage`) — a v1 store gets discarded rather than
+ * misread, since its `daily` totals were already misattributed by the bug
+ * that made v2 necessary (whole-file deltas dumped onto the day they were
+ * first observed, not the days they actually happened).
+ */
+const HISTORY_SCHEMA_VERSION = 2;
+
 function emptyStore(): HistoryStore {
   return { fileWatermarks: {}, daily: {} };
-}
-
-function emptyWatermark(): FileWatermark {
-  return { cost: 0, inputTokens: 0, outputTokens: 0, cacheCreationTokens: 0, cacheReadTokens: 0 };
 }
 
 function emptyDailyTotals(): DailyModelTotals {
@@ -48,6 +52,7 @@ export function loadHistory(storageDir: string): HistoryStore {
   try {
     const raw = fs.readFileSync(historyFilePath(storageDir), "utf8");
     const parsed = JSON.parse(raw);
+    if (parsed.version !== HISTORY_SCHEMA_VERSION) return emptyStore();
     return {
       fileWatermarks: parsed.fileWatermarks ?? {},
       daily: parsed.daily ?? {},
@@ -60,7 +65,7 @@ export function loadHistory(storageDir: string): HistoryStore {
 export function saveHistory(storageDir: string, store: HistoryStore): void {
   try {
     fs.mkdirSync(storageDir, { recursive: true });
-    fs.writeFileSync(historyFilePath(storageDir), JSON.stringify(store));
+    fs.writeFileSync(historyFilePath(storageDir), JSON.stringify({ version: HISTORY_SCHEMA_VERSION, ...store }));
   } catch {
     // Best effort — history is a nice-to-have, not core functionality.
   }
@@ -73,42 +78,38 @@ export function formatLocalDate(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-/** Records the delta between this file's last-seen usage and its current usage, attributed to `dateStr`. */
-export function recordUsage(
+/**
+ * Attributes each new turn (since the last-seen turn count for this file) to the
+ * calendar day it actually happened on, per its own timestamp — not the day it
+ * was first observed. This lets a transcript from several days ago (e.g. one the
+ * extension only just started watching) backfill its real days instead of
+ * dumping its whole history onto today.
+ */
+export function recordTranscriptUsage(
   store: HistoryStore,
   filePath: string,
-  usage: UsageTotals,
-  cost: number | undefined,
-  dateStr: string
+  turns: TranscriptTurn[],
+  pricing: Record<string, ModelPricing>,
+  fallbackDateStr: string
 ): void {
-  const prev = store.fileWatermarks[filePath] ?? emptyWatermark();
+  const prevCount = store.fileWatermarks[filePath]?.turnsRecorded ?? 0;
+  if (turns.length <= prevCount) return;
 
-  const deltaCost = Math.max(0, (cost ?? prev.cost) - prev.cost);
-  const deltaInput = Math.max(0, usage.inputTokens - prev.inputTokens);
-  const deltaOutput = Math.max(0, usage.outputTokens - prev.outputTokens);
-  const deltaCacheCreate = Math.max(0, usage.cacheCreationTokens - prev.cacheCreationTokens);
-  const deltaCacheRead = Math.max(0, usage.cacheReadTokens - prev.cacheReadTokens);
+  for (const turn of turns.slice(prevCount)) {
+    const model = turn.model ?? "unknown";
+    const dateStr = turn.timestamp ? formatLocalDate(new Date(turn.timestamp)) : fallbackDateStr;
+    const cost = estimateCostUsd(turn, pricing) ?? 0;
 
-  store.fileWatermarks[filePath] = {
-    cost: cost ?? prev.cost,
-    inputTokens: usage.inputTokens,
-    outputTokens: usage.outputTokens,
-    cacheCreationTokens: usage.cacheCreationTokens,
-    cacheReadTokens: usage.cacheReadTokens,
-  };
+    const day = (store.daily[dateStr] ??= {});
+    const bucket = (day[model] ??= emptyDailyTotals());
+    bucket.cost += cost;
+    bucket.inputTokens += turn.inputTokens;
+    bucket.outputTokens += turn.outputTokens;
+    bucket.cacheCreationTokens += turn.cacheCreationTokens;
+    bucket.cacheReadTokens += turn.cacheReadTokens;
+  }
 
-  const noChange =
-    deltaCost === 0 && deltaInput === 0 && deltaOutput === 0 && deltaCacheCreate === 0 && deltaCacheRead === 0;
-  if (noChange) return;
-
-  const model = usage.model ?? "unknown";
-  const day = (store.daily[dateStr] ??= {});
-  const bucket = (day[model] ??= emptyDailyTotals());
-  bucket.cost += deltaCost;
-  bucket.inputTokens += deltaInput;
-  bucket.outputTokens += deltaOutput;
-  bucket.cacheCreationTokens += deltaCacheCreate;
-  bucket.cacheReadTokens += deltaCacheRead;
+  store.fileWatermarks[filePath] = { turnsRecorded: turns.length };
 }
 
 export function pruneOldDays(

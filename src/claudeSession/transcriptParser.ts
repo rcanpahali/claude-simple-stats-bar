@@ -17,6 +17,16 @@ export interface UsageTotals {
   lastCompactionTimestamp?: string;
 }
 
+/** Token usage for a single assistant turn, with the timestamp it actually happened at (not when it was observed). */
+export interface TranscriptTurn {
+  timestamp?: string;
+  model?: string;
+  inputTokens: number;
+  outputTokens: number;
+  cacheCreationTokens: number;
+  cacheReadTokens: number;
+}
+
 function emptyTotals(contextWindowTokens: number): UsageTotals {
   return {
     inputTokens: 0,
@@ -41,26 +51,25 @@ const COMPACTION_DROP_RATIO = 0.4;
 const COMPACTION_MIN_WINDOW_FRACTION = 0.1;
 
 /**
- * Sums token usage across every assistant turn in a Claude Code transcript.
- * Each JSONL line is a loosely-typed session entry; assistant entries carry
- * a `message.usage` object shaped like the Anthropic Messages API response.
- * Lines that don't match (tool results, user turns, malformed JSON) are skipped.
+ * Sums token usage across every assistant turn in a Claude Code transcript, and
+ * returns the per-turn breakdown alongside it. Each JSONL line is a loosely-typed
+ * session entry; assistant entries carry a `message.usage` object shaped like the
+ * Anthropic Messages API response. Lines that don't match (tool results, user
+ * turns, malformed JSON) are skipped.
  */
-export function parseTranscript(
+export function parseTranscriptWithTurns(
   filePath: string,
   contextWindowOverride?: number
-): UsageTotals {
+): { totals: UsageTotals; turns: TranscriptTurn[] } {
   const totals = emptyTotals(resolveContextWindowTokens(undefined, contextWindowOverride));
+  const turns: TranscriptTurn[] = [];
 
   let raw: string;
   try {
     raw = fs.readFileSync(filePath, "utf8");
   } catch {
-    return totals;
+    return { totals, turns };
   }
-
-  const turnTokens: number[] = [];
-  const turnTimestamps: (string | undefined)[] = [];
 
   for (const line of raw.split("\n")) {
     if (!line.trim()) continue;
@@ -85,29 +94,38 @@ export function parseTranscript(
     totals.outputTokens += output;
     totals.cacheCreationTokens += cacheCreate;
     totals.cacheReadTokens += cacheRead;
+    totals.lastTurnInputTokens = input + cacheCreate + cacheRead;
 
-    const effective = input + cacheCreate + cacheRead;
-    totals.lastTurnInputTokens = effective;
-    turnTokens.push(effective);
     const timestamp = (entry as any)?.timestamp;
-    turnTimestamps.push(typeof timestamp === "string" ? timestamp : undefined);
+    const turnModel = typeof model === "string" && model.length > 0 ? model : undefined;
+    if (turnModel) totals.model = turnModel;
 
-    if (typeof model === "string" && model.length > 0) {
-      totals.model = model;
-    }
+    turns.push({
+      timestamp: typeof timestamp === "string" ? timestamp : undefined,
+      model: turnModel,
+      inputTokens: input,
+      outputTokens: output,
+      cacheCreationTokens: cacheCreate,
+      cacheReadTokens: cacheRead,
+    });
   }
 
   totals.contextWindowTokens = resolveContextWindowTokens(totals.model, contextWindowOverride);
 
   const minPriorTokens = totals.contextWindowTokens * COMPACTION_MIN_WINDOW_FRACTION;
-  for (let i = 1; i < turnTokens.length; i++) {
-    const prev = turnTokens[i - 1];
-    const curr = turnTokens[i];
+  for (let i = 1; i < turns.length; i++) {
+    const prev = turns[i - 1].inputTokens + turns[i - 1].cacheCreationTokens + turns[i - 1].cacheReadTokens;
+    const curr = turns[i].inputTokens + turns[i].cacheCreationTokens + turns[i].cacheReadTokens;
     if (prev >= minPriorTokens && curr < prev * COMPACTION_DROP_RATIO) {
       totals.compactionCount++;
-      totals.lastCompactionTimestamp = turnTimestamps[i];
+      totals.lastCompactionTimestamp = turns[i].timestamp;
     }
   }
 
-  return totals;
+  return { totals, turns };
+}
+
+/** Convenience wrapper for callers that only need the cumulative totals, not the per-turn breakdown. */
+export function parseTranscript(filePath: string, contextWindowOverride?: number): UsageTotals {
+  return parseTranscriptWithTurns(filePath, contextWindowOverride).totals;
 }

@@ -1,12 +1,12 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { parseTranscript, UsageTotals } from "./transcriptParser";
+import { parseTranscriptWithTurns, TranscriptTurn, UsageTotals } from "./transcriptParser";
 import { estimateCostUsd, ModelPricing, resolvePricing } from "./pricing";
 import { SessionManager } from "./sessionManager";
 import { ClaudeSessionPanel, PanelSessionInfo } from "./panel";
 import { activeSessionLabel, fallbackSessionLabel, loadSessionNames, shortSessionId } from "./sessionNames";
-import { formatLocalDate, HistoryStore, loadHistory, pruneOldDays, recordUsage, saveHistory } from "./history";
+import { formatLocalDate, HistoryStore, loadHistory, pruneOldDays, recordTranscriptUsage, saveHistory } from "./history";
 
 function formatTokenCount(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -45,6 +45,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
   private pollTimer?: ReturnType<typeof setInterval>;
   private currentFile?: string;
   private lastUsage?: UsageTotals;
+  private lastTurns?: TranscriptTurn[];
 
   /** 0 means "auto-detect from the model" — see `contextWindow.ts`. */
   private contextWindowTokens = 0;
@@ -110,6 +111,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
       this.watcher = undefined;
       this.currentFile = undefined;
       this.lastUsage = undefined;
+      this.lastTurns = undefined;
       this.item.text = "$(hubot) no session";
       this.item.tooltip = "No Claude Code session transcript found for this workspace.";
       if (this.panel.isVisible) this.panel.update([], this.historyStore);
@@ -118,8 +120,9 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
 
     this.ensureWatching(primary);
 
-    const usage = parseTranscript(primary, this.contextWindowTokens);
+    const { totals: usage, turns } = parseTranscriptWithTurns(primary, this.contextWindowTokens);
     this.lastUsage = usage;
+    this.lastTurns = turns;
 
     const totalTokens =
       usage.inputTokens +
@@ -156,10 +159,10 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
     const panelSessions: PanelSessionInfo[] = [];
 
     for (const s of sessions) {
-      const usage =
-        s.file === primaryFile && this.lastUsage
-          ? this.lastUsage
-          : parseTranscript(s.file, this.contextWindowTokens);
+      const isPrimaryWithCache = s.file === primaryFile && this.lastUsage && this.lastTurns;
+      const { totals: usage, turns } = isPrimaryWithCache
+        ? { totals: this.lastUsage!, turns: this.lastTurns! }
+        : parseTranscriptWithTurns(s.file, this.contextWindowTokens);
       const cost = estimateCostUsd(usage, this.pricing);
       const sessionId = path.basename(s.file, ".jsonl");
       const liveName = sessionNames.get(sessionId);
@@ -167,7 +170,7 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
       panelSessions.push({ file: s.file, name, usage, cost, isPrimary: s.file === primaryFile });
 
       if (this.historyStorageDir) {
-        recordUsage(this.historyStore, s.file, usage, cost, today);
+        recordTranscriptUsage(this.historyStore, s.file, turns, this.pricing, today);
       }
     }
 
