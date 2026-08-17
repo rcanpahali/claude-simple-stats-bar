@@ -2,6 +2,12 @@
 
 Notable changes to this extension, by version. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.4] - 2026-08-17
+
+### Fixed
+
+- README images on the Marketplace listing pointed at `.../raw/HEAD/docs/images/*.png`, which 404s — `vsce` infers the branch for these links from the local git checkout, and the publish workflow's `actions/checkout` leaves it in a detached-HEAD state. `vsce package` now runs with `--githubBranch main` so the links always resolve to `main` regardless of checkout state.
+
 ## [0.4.3] - 2026-08-17
 
 ### Changed

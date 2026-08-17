@@ -2,7 +2,7 @@
   "name": "claude-simple-stats-bar",
   "displayName": "Claude Simple Stats Bar",
   "description": "Editor stats and live Claude Code session usage (model, tokens, cost, context %, multi-session and history) in the VS Code status bar.",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "publisher": "rcanpahali",
   "license": "MIT",
   "icon": "icon.png",
@@ -61,7 +61,7 @@
     "compile": "tsc -p ./",
     "watch": "tsc -w -p ./",
     "screenshot": "node scripts/screenshot-prototype.mjs",
-    "package": "rm -f *.vsix && npm run compile && npx @vscode/vsce package"
+    "package": "rm -f *.vsix && npm run compile && npx @vscode/vsce package --githubBranch main"
   },
   "devDependencies": {
     "@types/vscode": "^1.90.0",
