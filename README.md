@@ -23,20 +23,6 @@ Live Claude Code session stats — model, tokens, context left, cost — in the 
 
 Search for **Claude Simple Stats Bar** in the VS Code Extensions view, install from the [Marketplace listing](https://marketplace.visualstudio.com/items?itemName=rcanpahali.claude-simple-stats-bar), or open it directly in VS Code: [vscode:extension/rcanpahali.claude-simple-stats-bar](vscode:extension/rcanpahali.claude-simple-stats-bar).
 
-**Or build it from source:**
-
-```bash
-git clone https://github.com/rcanpahali/claude-simple-stats-bar.git
-cd claude-simple-stats-bar
-npm install
-npm run package
-code --install-extension claude-simple-stats-bar-*.vsix
-```
-
-Then reload the window (`Cmd+Shift+P` → "Developer: Reload Window"). After code changes, run `npm run package` again (it removes the old `.vsix` before rebuilding) followed by the install command.
-
-Or press `F5` from a clone to compile and open an Extension Development Host window with it loaded, without installing anything.
-
 ## Requirements
 
 - VS Code 1.90 or newer.
@@ -104,6 +90,17 @@ Built-in USD rates ship for the current Sonnet/Opus/Haiku/Fable lineup (as of 20
 ```
 
 Models with neither a built-in default nor a configured entry show cost as `n/a`.
+
+## Build from source
+
+```bash
+git clone https://github.com/rcanpahali/claude-simple-stats-bar.git
+cd claude-simple-stats-bar
+npm install && npm run package
+code --install-extension claude-simple-stats-bar-*.vsix
+```
+
+Re-run `npm run package` after code changes and reinstall, or press `F5` to launch an Extension Development Host without installing anything.
 
 ## Changelog
 
