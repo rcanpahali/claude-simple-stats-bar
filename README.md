@@ -12,16 +12,16 @@ Live Claude Code session stats — model, tokens, context left, cost — in the 
 
 ![The Claude segment: model, total tokens, context used, and estimated cost](docs/images/statusbar-hero.png)
 
+Toggle what you don't need — `showModel` and `showSeverityTag`, both on by default:
+
+![The Claude segment with the model name and severity tag turned off, leaving tokens, context percentage, and cost](docs/images/statusbar-minimal.png)
+
 ## Features
 
 - A status bar segment shows your model, total tokens, context used, and estimated cost. It updates live as you chat.
 - Hover the segment for a full token breakdown and the transcript path.
 - Click the segment for a session panel listing every session in the workspace, a 7-day spend chart, and spend by model.
 - Pricing and poll interval are both configurable.
-
-## Install
-
-Search for **Claude Simple Stats Bar** in the VS Code Extensions view, install from the [Marketplace listing](https://marketplace.visualstudio.com/items?itemName=rcanpahali.claude-simple-stats-bar), or open it directly in VS Code: [vscode:extension/rcanpahali.claude-simple-stats-bar](vscode:extension/rcanpahali.claude-simple-stats-bar).
 
 ## Requirements
 
@@ -58,6 +58,8 @@ Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 | `claudeSimpleStatsBar.pollIntervalMs` | `2000` | How often to re-check the transcript file, alongside the file watcher. |
 | `claudeSimpleStatsBar.contextWindowTokens` | `0` | Override the context window size used for context % and compaction detection. `0` auto-detects from the model (1,000,000 for Sonnet/Opus/Fable, 200,000 for Haiku 4.5). |
 | `claudeSimpleStatsBar.showContextBar` | `false` | Show the 6-segment fill bar next to the context-usage tag. Off by default; turn on to add the bar back next to the icon, tag, and percentage. |
+| `claudeSimpleStatsBar.showModel` | `true` | Show the model name in the status bar. On by default; turn off to hide it entirely. |
+| `claudeSimpleStatsBar.showSeverityTag` | `true` | Show the CALM/MED/WARN/CRIT severity tag and its icon next to the context-usage percentage. On by default; turn off to show just the bare percentage. |
 | `claudeSimpleStatsBar.pricing` | `{}` | Per-model USD rates per 1M tokens; overrides or extends the built-in defaults. See [Cost estimates](#cost-estimates). |
 
 ## Commands

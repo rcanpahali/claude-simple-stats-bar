@@ -2,6 +2,12 @@
 
 Notable changes to this extension, by version. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.5] - 2026-08-24
+
+### Added
+
+- `claudeSimpleStatsBar.showModel` and `claudeSimpleStatsBar.showSeverityTag` settings, both on by default. Turn `showModel` off to hide the model name (and its icon) from the status bar; turn `showSeverityTag` off to hide the CALM/MED/WARN/CRIT tag (and its icon), leaving just the bare percentage.
+
 ## [0.4.4] - 2026-08-17
 
 ### Fixed

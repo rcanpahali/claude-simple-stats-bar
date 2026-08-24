@@ -52,6 +52,8 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
   private pollIntervalMs = 2000;
   private pricing: Record<string, ModelPricing> = {};
   private showContextBar = false;
+  private showModel = true;
+  private showSeverityTag = true;
 
   constructor(context: vscode.ExtensionContext) {
     this.item = vscode.window.createStatusBarItem(
@@ -79,6 +81,8 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
     this.contextWindowTokens = cfg.get<number>("contextWindowTokens", 0);
     this.pricing = resolvePricing(cfg.get<Record<string, ModelPricing>>("pricing", {}));
     this.showContextBar = cfg.get<boolean>("showContextBar", false);
+    this.showModel = cfg.get<boolean>("showModel", true);
+    this.showSeverityTag = cfg.get<boolean>("showSeverityTag", true);
 
     const newPollIntervalMs = cfg.get<number>("pollIntervalMs", 2000);
     if (newPollIntervalMs !== this.pollIntervalMs || !this.pollTimer) {
@@ -141,11 +145,18 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
     const contextSegment = this.showContextBar
       ? `${severity.tag} ${formatContextBar(contextPct)}  ${contextPct}% ctx`
       : `${severity.tag}  ${contextPct}% ctx`;
+    const bareContextSegment = this.showContextBar
+      ? `${formatContextBar(contextPct)}  ${contextPct}% ctx`
+      : `${contextPct}% ctx`;
+    const severitySegment = this.showSeverityTag
+      ? `${severity.icon} ${contextSegment}`
+      : bareContextSegment;
+    const modelSegment = this.showModel ? `$(dashboard) ${usage.model ?? "claude"} · ` : "";
 
     this.item.text =
-      `$(dashboard) ${usage.model ?? "claude"} · ` +
+      `${modelSegment}` +
       `$(pulse) ${formatTokenCount(totalTokens)} tok · ` +
-      `${severity.icon} ${contextSegment} · ` +
+      `${severitySegment} · ` +
       `$(credit-card) ${costLabel}`;
     this.item.tooltip = this.buildTooltip(usage, contextPct, costLabel);
 

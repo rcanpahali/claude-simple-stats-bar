@@ -232,7 +232,7 @@
   <div class="panel active" id="panel-bar">
     <div class="barwrap">
       <div class="vsbar" id="bar">
-        <span class="ic">&#xeacd;</span>claude-sonnet-5 &middot; <span class="ic">&#xeb31;</span>2.3M tok &middot; <span class="ic" id="icon">&#xeb08;</span><span id="tag">CALM </span><span id="fill">▮▮▮▯▯▯</span><span id="gap">&nbsp;&nbsp;</span><span id="pct">45</span>% ctx &middot; <span class="ic">&#xeac9;</span>$1.506
+        <span id="modelSegment"><span class="ic">&#xeacd;</span>claude-sonnet-5 &middot; </span><span class="ic">&#xeb31;</span>2.3M tok &middot; <span id="severitySegment"><span class="ic" id="icon">&#xeb08;</span><span id="tag">CALM </span></span><span id="fill">▮▮▮▯▯▯</span><span id="gap">&nbsp;&nbsp;</span><span id="pct">45</span>% ctx &middot; <span class="ic">&#xeac9;</span>$1.506
       </div>
     </div>
   </div>
@@ -256,7 +256,7 @@
       </div>
       <div class="tooltip-bar">
         <div class="right">
-          <span class="ic">&#xeacd;</span>claude-sonnet-5 &middot; <span class="ic">&#xeb31;</span>7.4M tok &middot; <span class="ic" id="icon-mini">&#xeb08;</span><span id="tag-mini">CALM </span><span id="fill-mini">▮▮▮▯▯▯</span><span id="gap-mini">&nbsp;&nbsp;</span><span id="pct-mini">45</span>% ctx &middot; <span class="ic">&#xeac9;</span>$3.687
+          <span id="modelSegment-mini"><span class="ic">&#xeacd;</span>claude-sonnet-5 &middot; </span><span class="ic">&#xeb31;</span>7.4M tok &middot; <span id="severitySegment-mini"><span class="ic" id="icon-mini">&#xeb08;</span><span id="tag-mini">CALM </span></span><span id="fill-mini">▮▮▮▯▯▯</span><span id="gap-mini">&nbsp;&nbsp;</span><span id="pct-mini">45</span>% ctx &middot; <span class="ic">&#xeac9;</span>$3.687
         </div>
       </div>
     </div>
@@ -417,6 +417,14 @@
         <span class="mark" style="left:90%"></span><span style="left:90%">90</span>
       </div>
       <label class="toggle-row">
+        <input type="checkbox" id="showModel" checked />
+        Show model <span class="toggle-hint">(<code>claudeSimpleStatsBar.showModel</code> setting, defaulting to on &mdash; unchecked drops the model name and its icon from the status bar entirely)</span>
+      </label>
+      <label class="toggle-row">
+        <input type="checkbox" id="showSeverityTag" checked />
+        Show severity tag <span class="toggle-hint">(<code>claudeSimpleStatsBar.showSeverityTag</code> setting, defaulting to on &mdash; unchecked drops the CALM/MED/WARN/CRIT tag and its icon, leaving just the percentage)</span>
+      </label>
+      <label class="toggle-row">
         <input type="checkbox" id="showBar" />
         Show context bar <span class="toggle-hint">(<code>claudeSimpleStatsBar.showContextBar</code> setting, now defaulting to off &mdash; unchecked keeps the icon, tag, and percentage, just drops the bar)</span>
       </label>
@@ -441,7 +449,7 @@
       </div>
     </div>
 
-    <footer>&ldquo;medium&rdquo; and the <code>$(graph-line)</code> icon are placeholders for the new tier &mdash; rename or swap the icon if something else reads better. The <code>CALM</code>/<code>MED</code>/<code>WARN</code>/<code>CRIT</code> tag is new too &mdash; drop it if the icon + bar already read clearly enough on their own. Set a level here, then switch to the <b>Tooltip</b> tab to see it reflected in the status bar row underneath the hover card &mdash; the ctx gauge is status-bar-only, so the card itself doesn't repeat it. The <b>Session panel</b> tab has no ctx gauge at all &mdash; that indicator is only per-turn, so it doesn't map cleanly onto a list of sessions.</footer>
+    <footer>&ldquo;medium&rdquo; and the <code>$(graph-line)</code> icon are placeholders for the new tier &mdash; rename or swap the icon if something else reads better. The <code>CALM</code>/<code>MED</code>/<code>WARN</code>/<code>CRIT</code> tag is new too &mdash; drop it if the icon + bar already read clearly enough on their own. Set a level here, then switch to the <b>Tooltip</b> tab to see it reflected in the status bar row underneath the hover card &mdash; the ctx gauge is status-bar-only, so the card itself doesn't repeat it. The <b>Session panel</b> tab has no ctx gauge at all &mdash; that indicator is only per-turn, so it doesn't map cleanly onto a list of sessions. Uncheck &ldquo;Show model&rdquo; and &ldquo;Show severity tag&rdquo; above to preview the minimal look &mdash; both toggles only affect the status bar (and its mirrored row in the Tooltip tab); the tooltip card's own &ldquo;Model:&rdquo; line and the Session panel are unaffected either way.</footer>
   </div>
 </div>
 
@@ -520,6 +528,24 @@
 
   slider.addEventListener('input', renderTooltip);
   renderTooltip();
+
+  const showModel = document.getElementById('showModel');
+  const showSeverityTag = document.getElementById('showSeverityTag');
+  const modelSegment = document.getElementById('modelSegment');
+  const modelSegmentMini = document.getElementById('modelSegment-mini');
+  const severitySegment = document.getElementById('severitySegment');
+  const severitySegmentMini = document.getElementById('severitySegment-mini');
+
+  function applyToggleVisibility() {
+    modelSegment.style.display = showModel.checked ? '' : 'none';
+    modelSegmentMini.style.display = showModel.checked ? '' : 'none';
+    severitySegment.style.display = showSeverityTag.checked ? '' : 'none';
+    severitySegmentMini.style.display = showSeverityTag.checked ? '' : 'none';
+  }
+
+  showModel.addEventListener('change', applyToggleVisibility);
+  showSeverityTag.addEventListener('change', applyToggleVisibility);
+  applyToggleVisibility();
 
   const sessionList = document.getElementById('sessionList');
   const showMoreBtn = document.getElementById('showMoreBtn');
