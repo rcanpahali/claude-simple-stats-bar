@@ -1,12 +1,9 @@
 # Claude Simple Stats Bar (VS Code)
 
-[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/rcanpahali.claude-simple-stats-bar)](https://marketplace.visualstudio.com/items?itemName=rcanpahali.claude-simple-stats-bar)
+[![Visual Studio Marketplace Version](https://vsmarketplacebadges.dev/version/rcanpahali.claude-simple-stats-bar.svg)](https://marketplace.visualstudio.com/items?itemName=rcanpahali.claude-simple-stats-bar)
 [![Open VSX Version](https://img.shields.io/open-vsx/v/rcanpahali/claude-simple-stats-bar)](https://open-vsx.org/extension/rcanpahali/claude-simple-stats-bar)
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.90.0-blue?logo=visualstudiocode)](https://code.visualstudio.com/)
 [![License: MIT](https://img.shields.io/github/license/rcanpahali/claude-simple-stats-bar)](LICENSE)
-
-[![Sponsor](https://img.shields.io/github/sponsors/rcanpahali?logo=githubsponsors&label=Sponsor)](https://github.com/sponsors/rcanpahali)
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/rcanpahali)
 
 Live Claude Code session stats — model, tokens, context left, cost — in the VS Code status bar.
 
@@ -36,7 +33,7 @@ Shown here with `showModel` and `showSeverityTag` both on, to label every part �
 
 - **Model** — the active model name, led by a dashboard icon. Off by default; enable via `showModel`.
 - **Total tokens** — input + output + cache for the whole session.
-- **Context used** — a bare percentage by default, based on the *last turn only*, not a running total. Answers "will my next message fit," not "how much have I used overall." Enable `showSeverityTag` for the CALM/MED/WARN/CRIT icon and tag, and `showContextBar` for the 6-segment fill bar.
+- **Context used** — a bare percentage by default, based on the _last turn only_, not a running total. Answers "will my next message fit," not "how much have I used overall." Enable `showSeverityTag` for the CALM/MED/WARN/CRIT icon and tag, and `showContextBar` for the 6-segment fill bar.
 - **Estimated cost** — built-in pricing for the current Sonnet/Opus/Haiku/Fable lineup; override via `claudeSimpleStatsBar.pricing` (see [Cost estimates](#cost-estimates)).
 
 Hover the segment for a per-category token breakdown and the transcript path:
@@ -51,25 +48,25 @@ Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 
 1. **Sessions in this workspace** — every transcript found here, with the primary one marked. Each row shows a timestamp to tell sessions apart: `last active <time>` for a still-running session, or a scaled `ended <time>` for one that's finished. Only the 6 most recent show by default — click **Show more sessions** to reveal the rest. Running more than one session at once? Use **Make primary**, or the **Switch Primary Session** command, to pick a different one — the pick persists across VS Code restarts.
 2. **Last 7 days** — a spend chart and per-model breakdown, stored locally and pruned past 7 days.
-3. **Compaction** — a heuristic count of likely compaction events.
+3. **Compaction** — a count of likely compaction events.
 
 ## Settings
 
-| Setting | Default | What it does |
-|---|---|---|
-| `claudeSimpleStatsBar.pollIntervalMs` | `2000` | How often to re-check the transcript file, alongside the file watcher. |
-| `claudeSimpleStatsBar.contextWindowTokens` | `0` | Override the context window size used for context % and compaction detection. `0` auto-detects from the model (1,000,000 for Sonnet/Opus/Fable, 200,000 for Haiku 4.5). |
-| `claudeSimpleStatsBar.showContextBar` | `false` | Show the 6-segment fill bar next to the context-usage tag. Off by default; turn on to add the bar back next to the icon, tag, and percentage. |
-| `claudeSimpleStatsBar.showModel` | `false` | Show the model name in the status bar. Off by default, for a minimal bar; turn on to include it. |
-| `claudeSimpleStatsBar.showSeverityTag` | `false` | Show the CALM/MED/WARN/CRIT severity tag and its icon next to the context-usage percentage. Off by default, for a minimal bar; turn on to include the tag. |
-| `claudeSimpleStatsBar.pricing` | `{}` | Per-model USD rates per 1M tokens; overrides or extends the built-in defaults. See [Cost estimates](#cost-estimates). |
+| Setting                                    | Default | What it does                                                                                                                                                            |
+| ------------------------------------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `claudeSimpleStatsBar.pollIntervalMs`      | `2000`  | How often to re-check the transcript file, alongside the file watcher.                                                                                                  |
+| `claudeSimpleStatsBar.contextWindowTokens` | `0`     | Override the context window size used for context % and compaction detection. `0` auto-detects from the model (1,000,000 for Sonnet/Opus/Fable, 200,000 for Haiku 4.5). |
+| `claudeSimpleStatsBar.showContextBar`      | `false` | Show the 6-segment fill bar next to the context-usage tag. Off by default; turn on to add the bar back next to the icon, tag, and percentage.                           |
+| `claudeSimpleStatsBar.showModel`           | `false` | Show the model name in the status bar. Off by default, for a minimal bar; turn on to include it.                                                                        |
+| `claudeSimpleStatsBar.showSeverityTag`     | `false` | Show the CALM/MED/WARN/CRIT severity tag and its icon next to the context-usage percentage. Off by default, for a minimal bar; turn on to include the tag.              |
+| `claudeSimpleStatsBar.pricing`             | `{}`    | Per-model USD rates per 1M tokens; overrides or extends the built-in defaults. See [Cost estimates](#cost-estimates).                                                   |
 
 ## Commands
 
-| Command | What it does |
-|---|---|
-| `Claude Simple Stats Bar: Refresh` | Force a re-read of the current transcript. |
-| `Claude Simple Stats Bar: Open Session Panel` | Open the webview panel (also bound to clicking the Claude segment). |
+| Command                                           | What it does                                                           |
+| ------------------------------------------------- | ---------------------------------------------------------------------- |
+| `Claude Simple Stats Bar: Refresh`                | Force a re-read of the current transcript.                             |
+| `Claude Simple Stats Bar: Open Session Panel`     | Open the webview panel (also bound to clicking the Claude segment).    |
 | `Claude Simple Stats Bar: Switch Primary Session` | Pick which concurrent session in this workspace is tracked as primary. |
 
 ## Where the data comes from
@@ -109,3 +106,6 @@ Re-run `npm run package` after code changes and reinstall, or press `F5` to laun
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md).
+
+[![Sponsor](https://img.shields.io/github/sponsors/rcanpahali?logo=githubsponsors&label=Sponsor)](https://github.com/sponsors/rcanpahali)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/rcanpahali)
