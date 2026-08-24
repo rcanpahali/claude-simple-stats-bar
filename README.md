@@ -5,17 +5,17 @@
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.90.0-blue?logo=visualstudiocode)](https://code.visualstudio.com/)
 [![License: MIT](https://img.shields.io/github/license/rcanpahali/claude-simple-stats-bar)](LICENSE)
 
-Live Claude Code session stats — model, tokens, context left, cost — in the VS Code status bar.
+Live Claude Code session stats - model, tokens, context left, cost - in the VS Code status bar.
 
 ![The Claude segment: total tokens, context used, and estimated cost](docs/images/statusbar-hero.png)
 
-Minimal by default. Turn on `showModel` and `showSeverityTag` for the model name and the CALM/MED/WARN/CRIT tag:
+Minimal by default. Turn on `showModel` and `showSeverityTag` for the model name and the severity tag:
 
 ![The Claude segment with the model name and severity tag turned on, in front of tokens, context percentage, and cost](docs/images/statusbar-full.png)
 
 ## Features
 
-- A status bar segment shows total tokens, context used, and estimated cost — model name and severity tag are opt-in. It updates live as you chat.
+- A status bar segment shows total tokens, context used, and estimated cost - model name and severity tag are opt-in. It updates live as you chat.
 - Hover the segment for a full token breakdown and the transcript path.
 - Click the segment for a session panel listing every session in the workspace, a 7-day spend chart, and spend by model.
 - Pricing and poll interval are both configurable.
@@ -27,14 +27,7 @@ Minimal by default. Turn on `showModel` and `showSeverityTag` for the model name
 
 ## Claude segment
 
-![Anatomy of the Claude segment: model, total tokens, context used, estimated cost, and the four severity-tag states](docs/images/statusbar-anatomy.png)
-
-Shown here with `showModel` and `showSeverityTag` both on, to label every part — off by default.
-
-- **Model** — the active model name, led by a dashboard icon. Off by default; enable via `showModel`.
-- **Total tokens** — input + output + cache for the whole session.
-- **Context used** — a bare percentage by default, based on the _last turn only_, not a running total. Answers "will my next message fit," not "how much have I used overall." Enable `showSeverityTag` for the CALM/MED/WARN/CRIT icon and tag, and `showContextBar` for the 6-segment fill bar.
-- **Estimated cost** — built-in pricing for the current Sonnet/Opus/Haiku/Fable lineup; override via `claudeSimpleStatsBar.pricing` (see [Cost estimates](#cost-estimates)).
+Context % is just your last message, not the whole session. It tells you if your next message will fit, not how much you've used so far. The optional severity tag colors that percentage: CALM under 50%, MED 50-69%, WARN 70-89%, CRIT 90% or higher.
 
 Hover the segment for a per-category token breakdown and the transcript path:
 
@@ -46,9 +39,9 @@ Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 
 ![Session panel showing sessions in this workspace with last-active/ended timestamps, a "Show more sessions" link, an Extension Settings button, a compaction note, a 7-day spend chart, and spend by model](docs/images/panel-anatomy.png)
 
-1. **Sessions in this workspace** — every transcript found here, with the primary one marked. Each row shows a timestamp to tell sessions apart: `last active <time>` for a still-running session, or a scaled `ended <time>` for one that's finished. Only the 6 most recent show by default — click **Show more sessions** to reveal the rest. Running more than one session at once? Use **Make primary**, or the **Switch Primary Session** command, to pick a different one — the pick persists across VS Code restarts.
-2. **Last 7 days** — a spend chart and per-model breakdown, stored locally and pruned past 7 days.
-3. **Compaction** — a count of likely compaction events.
+1. **Sessions in this workspace** - every transcript found here, with the primary one marked. Each row shows a timestamp to tell sessions apart: `last active <time>` for a still-running session, or a scaled `ended <time>` for one that's finished. Only the 6 most recent show by default - click **Show more sessions** to reveal the rest. Running more than one session at once? Use **Make primary**, or the **Switch Primary Session** command, to pick a different one - the pick persists across VS Code restarts.
+2. **Last 7 days** - a spend chart and per-model breakdown, stored locally and pruned past 7 days.
+3. **Compaction** - a count of likely compaction events.
 
 ## Settings
 
@@ -75,7 +68,7 @@ There's no public API for Claude Code session telemetry. This extension reads th
 
 ## Cost estimates
 
-Built-in USD rates ship for the current Sonnet/Opus/Haiku/Fable lineup (as of 2026-08), so cost shows without any setup. Anthropic's pricing changes over time — verify current rates before relying on this for anything beyond a rough estimate. Override a model's rate, or add one that isn't built in, via `claudeSimpleStatsBar.pricing`:
+Built-in USD rates ship for the current Sonnet/Opus/Haiku/Fable lineup (as of 2026-08), so cost shows without any setup. Anthropic's pricing changes over time - verify current rates before relying on this for anything beyond a rough estimate. Override a model's rate, or add one that isn't built in, via `claudeSimpleStatsBar.pricing`:
 
 ```json
 {
