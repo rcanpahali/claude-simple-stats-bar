@@ -2,6 +2,12 @@
 
 Notable changes to this extension, by version. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.6] - 2026-08-24
+
+### Changed
+
+- `claudeSimpleStatsBar.showModel` and `claudeSimpleStatsBar.showSeverityTag` now default to `false`, so the status bar shows just tokens, context percentage, and cost out of the box. Turn either on to add back the model name or the CALM/MED/WARN/CRIT tag.
+
 ## [0.4.5] - 2026-08-24
 
 ### Added

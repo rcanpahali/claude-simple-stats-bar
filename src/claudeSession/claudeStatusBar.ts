@@ -52,8 +52,8 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
   private pollIntervalMs = 2000;
   private pricing: Record<string, ModelPricing> = {};
   private showContextBar = false;
-  private showModel = true;
-  private showSeverityTag = true;
+  private showModel = false;
+  private showSeverityTag = false;
 
   constructor(context: vscode.ExtensionContext) {
     this.item = vscode.window.createStatusBarItem(
@@ -81,8 +81,8 @@ export class ClaudeSessionStatusBar implements vscode.Disposable {
     this.contextWindowTokens = cfg.get<number>("contextWindowTokens", 0);
     this.pricing = resolvePricing(cfg.get<Record<string, ModelPricing>>("pricing", {}));
     this.showContextBar = cfg.get<boolean>("showContextBar", false);
-    this.showModel = cfg.get<boolean>("showModel", true);
-    this.showSeverityTag = cfg.get<boolean>("showSeverityTag", true);
+    this.showModel = cfg.get<boolean>("showModel", false);
+    this.showSeverityTag = cfg.get<boolean>("showSeverityTag", false);
 
     const newPollIntervalMs = cfg.get<number>("pollIntervalMs", 2000);
     if (newPollIntervalMs !== this.pollIntervalMs || !this.pollTimer) {

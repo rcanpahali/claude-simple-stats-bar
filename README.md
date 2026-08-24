@@ -10,15 +10,15 @@
 
 Live Claude Code session stats — model, tokens, context left, cost — in the VS Code status bar.
 
-![The Claude segment: model, total tokens, context used, and estimated cost](docs/images/statusbar-hero.png)
+![The Claude segment: total tokens, context used, and estimated cost](docs/images/statusbar-hero.png)
 
-Toggle what you don't need — `showModel` and `showSeverityTag`, both on by default:
+Minimal by default. Turn on `showModel` and `showSeverityTag` for the model name and the CALM/MED/WARN/CRIT tag:
 
-![The Claude segment with the model name and severity tag turned off, leaving tokens, context percentage, and cost](docs/images/statusbar-minimal.png)
+![The Claude segment with the model name and severity tag turned on, in front of tokens, context percentage, and cost](docs/images/statusbar-full.png)
 
 ## Features
 
-- A status bar segment shows your model, total tokens, context used, and estimated cost. It updates live as you chat.
+- A status bar segment shows total tokens, context used, and estimated cost — model name and severity tag are opt-in. It updates live as you chat.
 - Hover the segment for a full token breakdown and the transcript path.
 - Click the segment for a session panel listing every session in the workspace, a 7-day spend chart, and spend by model.
 - Pricing and poll interval are both configurable.
@@ -32,9 +32,11 @@ Toggle what you don't need — `showModel` and `showSeverityTag`, both on by def
 
 ![Anatomy of the Claude segment: model, total tokens, context used, estimated cost, and the four severity-tag states](docs/images/statusbar-anatomy.png)
 
-- **Model** — the active model name, led by a dashboard icon.
+Shown here with `showModel` and `showSeverityTag` both on, to label every part — off by default.
+
+- **Model** — the active model name, led by a dashboard icon. Off by default; enable via `showModel`.
 - **Total tokens** — input + output + cache for the whole session.
-- **Context used** — the icon/tag/bar from Features above, based on the *last turn only*, not a running total. Answers "will my next message fit," not "how much have I used overall."
+- **Context used** — a bare percentage by default, based on the *last turn only*, not a running total. Answers "will my next message fit," not "how much have I used overall." Enable `showSeverityTag` for the CALM/MED/WARN/CRIT icon and tag, and `showContextBar` for the 6-segment fill bar.
 - **Estimated cost** — built-in pricing for the current Sonnet/Opus/Haiku/Fable lineup; override via `claudeSimpleStatsBar.pricing` (see [Cost estimates](#cost-estimates)).
 
 Hover the segment for a per-category token breakdown and the transcript path:
@@ -58,8 +60,8 @@ Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 | `claudeSimpleStatsBar.pollIntervalMs` | `2000` | How often to re-check the transcript file, alongside the file watcher. |
 | `claudeSimpleStatsBar.contextWindowTokens` | `0` | Override the context window size used for context % and compaction detection. `0` auto-detects from the model (1,000,000 for Sonnet/Opus/Fable, 200,000 for Haiku 4.5). |
 | `claudeSimpleStatsBar.showContextBar` | `false` | Show the 6-segment fill bar next to the context-usage tag. Off by default; turn on to add the bar back next to the icon, tag, and percentage. |
-| `claudeSimpleStatsBar.showModel` | `true` | Show the model name in the status bar. On by default; turn off to hide it entirely. |
-| `claudeSimpleStatsBar.showSeverityTag` | `true` | Show the CALM/MED/WARN/CRIT severity tag and its icon next to the context-usage percentage. On by default; turn off to show just the bare percentage. |
+| `claudeSimpleStatsBar.showModel` | `false` | Show the model name in the status bar. Off by default, for a minimal bar; turn on to include it. |
+| `claudeSimpleStatsBar.showSeverityTag` | `false` | Show the CALM/MED/WARN/CRIT severity tag and its icon next to the context-usage percentage. Off by default, for a minimal bar; turn on to include the tag. |
 | `claudeSimpleStatsBar.pricing` | `{}` | Per-model USD rates per 1M tokens; overrides or extends the built-in defaults. See [Cost estimates](#cost-estimates). |
 
 ## Commands
