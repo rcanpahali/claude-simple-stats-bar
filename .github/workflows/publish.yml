@@ -1,10 +1,12 @@
 name: Publish Extension
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   publish:
@@ -33,6 +35,12 @@ jobs:
 
       - name: Publish to Open VSX
         run: npx ovsx publish "${{ steps.vsix.outputs.path }}" -p "${{ secrets.OVSX_PAT }}"
+
+      - name: Attach .vsix to GitHub Release
+        if: github.event_name == 'release'
+        run: gh release upload "${{ github.event.release.tag_name }}" "${{ steps.vsix.outputs.path }}" --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/upload-artifact@v4
         with:

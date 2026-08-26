@@ -13,8 +13,13 @@
   "engines": {
     "vscode": "^1.90.0"
   },
-  "categories": ["Visualization", "Other"],
-  "activationEvents": ["onStartupFinished"],
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -37,32 +42,32 @@
         "claudeSimpleStatsBar.pollIntervalMs": {
           "type": "number",
           "default": 2000,
-          "description": "Fallback poll interval (ms), alongside the file watcher."
+          "description": "Fallback poll interval (ms), used alongside the file watcher."
         },
         "claudeSimpleStatsBar.contextWindowTokens": {
           "type": "number",
           "default": 0,
-          "description": "Override the model's context window in tokens, for the context-usage % and compaction detection. Leave at 0 to auto-detect from the model (1,000,000 for Sonnet/Opus/Fable, 200,000 for Haiku 4.5)."
+          "description": "Override the model's context window in tokens. 0 auto-detects from the model."
         },
         "claudeSimpleStatsBar.showContextBar": {
           "type": "boolean",
           "default": false,
-          "description": "Show the 6-segment fill bar next to the context-usage tag. Off (default) keeps just the icon, tag, and percentage."
+          "description": "Show the 6-segment fill bar next to the context-usage tag."
         },
         "claudeSimpleStatsBar.showModel": {
           "type": "boolean",
           "default": false,
-          "description": "Show the model name in the status bar. Off (default) keeps the bar minimal; turn on to include it, led by a dashboard icon."
+          "description": "Show the model name in the status bar."
         },
         "claudeSimpleStatsBar.showSeverityTag": {
           "type": "boolean",
           "default": false,
-          "description": "Show the CALM/MED/WARN/CRIT severity tag and its icon next to the context-usage percentage. Off (default) shows just the bare percentage; turn on to include the tag."
+          "description": "Show the CALM/MED/WARN/CRIT severity tag next to the context-usage percentage."
         },
         "claudeSimpleStatsBar.pricing": {
           "type": "object",
           "default": {},
-          "description": "USD per 1M tokens, keyed by model id, e.g. { \"claude-sonnet-5\": { \"inputPerMillion\": 3, \"outputPerMillion\": 15, \"cacheWritePerMillion\": 3.75, \"cacheReadPerMillion\": 0.3 } }. Overrides built-in defaults for Sonnet/Opus/Haiku/Fable. Unlisted models with no entry show cost as n/a."
+          "description": "USD per 1M tokens, keyed by model id, e.g. { \"claude-sonnet-5\": { \"inputPerMillion\": 3, \"outputPerMillion\": 15, \"cacheWritePerMillion\": 3.75, \"cacheReadPerMillion\": 0.3 } }. Overrides defaults for Sonnet/Opus/Haiku/Fable."
         }
       }
     }
@@ -71,12 +76,16 @@
     "compile": "tsc -p ./",
     "watch": "tsc -w -p ./",
     "screenshot": "node scripts/screenshot-prototype.mjs",
-    "package": "rm -f *.vsix && npm run compile && npx @vscode/vsce package --githubBranch main"
+    "package": "rm -f *.vsix && npm run compile && npx @vscode/vsce package --githubBranch main",
+    "changeset": "changeset",
+    "release": "GITHUB_TOKEN=\"$(gh auth token)\" release-it"
   },
   "devDependencies": {
-    "@types/vscode": "^1.90.0",
+    "@changesets/cli": "^3.0.1",
     "@types/node": "^20.11.0",
+    "@types/vscode": "^1.90.0",
     "playwright": "^1.62.1",
+    "release-it": "^21.0.2",
     "typescript": "^5.4.0"
   }
 }

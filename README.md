@@ -39,7 +39,7 @@ Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 
 ![Session panel showing sessions in this workspace with last-active/ended timestamps, a "Show more sessions" link, an Extension Settings button, a compaction note, a 7-day spend chart, and spend by model](docs/images/panel-anatomy.png)
 
-1. **Sessions in this workspace** - every transcript found here, with the primary one marked. Each row shows a timestamp to tell sessions apart: `last active <time>` for a still-running session, or a scaled `ended <time>` for one that's finished. Only the 6 most recent show by default - click **Show more sessions** to reveal the rest. Running more than one session at once? Use **Make primary**, or the **Switch Primary Session** command, to pick a different one - the pick persists across VS Code restarts.
+1. **Sessions in this workspace** - every transcript found here, with the primary one marked. Each row shows a timestamp to tell sessions apart: `last active <time>` for a still-running session, or a scaled `ended <time>` for one that's finished. Only the 6 most recent show by default - click **Show more sessions** to reveal the rest. With more than one session running, use **Make primary**, or the **Switch Primary Session** command, to pick which one shows in the status bar - the pick persists across VS Code restarts.
 2. **Last 7 days** - a spend chart and per-model breakdown, stored locally and pruned past 7 days.
 3. **Compaction** - a count of likely compaction events.
 
@@ -47,12 +47,12 @@ Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 
 | Setting                                    | Default | What it does                                                                                                                                                            |
 | ------------------------------------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `claudeSimpleStatsBar.pollIntervalMs`      | `2000`  | How often to re-check the transcript file, alongside the file watcher.                                                                                                  |
-| `claudeSimpleStatsBar.contextWindowTokens` | `0`     | Override the context window size used for context % and compaction detection. `0` auto-detects from the model (1,000,000 for Sonnet/Opus/Fable, 200,000 for Haiku 4.5). |
-| `claudeSimpleStatsBar.showContextBar`      | `false` | Show the 6-segment fill bar next to the context-usage tag. Off by default; turn on to add the bar back next to the icon, tag, and percentage.                           |
-| `claudeSimpleStatsBar.showModel`           | `false` | Show the model name in the status bar. Off by default, for a minimal bar; turn on to include it.                                                                        |
-| `claudeSimpleStatsBar.showSeverityTag`     | `false` | Show the CALM/MED/WARN/CRIT severity tag and its icon next to the context-usage percentage. Off by default, for a minimal bar; turn on to include the tag.              |
-| `claudeSimpleStatsBar.pricing`             | `{}`    | Per-model USD rates per 1M tokens; overrides or extends the built-in defaults. See [Cost estimates](#cost-estimates).                                                   |
+| `claudeSimpleStatsBar.pollIntervalMs`      | `2000`  | How often to re-check the transcript file.                             |
+| `claudeSimpleStatsBar.contextWindowTokens` | `0`     | Override the model's context window size. `0` auto-detects.            |
+| `claudeSimpleStatsBar.showContextBar`      | `false` | Show the 6-segment fill bar next to the context-usage tag.             |
+| `claudeSimpleStatsBar.showModel`           | `false` | Show the model name in the status bar.                                 |
+| `claudeSimpleStatsBar.showSeverityTag`     | `false` | Show the CALM/MED/WARN/CRIT severity tag next to the context %.        |
+| `claudeSimpleStatsBar.pricing`             | `{}`    | Per-model USD rates per 1M tokens. See [Cost estimates](#cost-estimates). |
 
 ## Commands
 

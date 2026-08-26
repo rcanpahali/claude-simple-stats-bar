@@ -8,3 +8,5 @@ CLAUDE.md
 docs/images/*.svg
 prototypes/**
 scripts/**
+.changeset/**
+.release-it.json

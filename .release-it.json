@@ -1,0 +1,22 @@
+{
+  "increment": false,
+  "git": {
+    "requireBranch": "main",
+    "requireCleanWorkingDir": false,
+    "commitMessage": "chore: release v${version}",
+    "tagName": "v${version}",
+    "tagAnnotation": "Release v${version}"
+  },
+  "github": {
+    "release": true,
+    "releaseName": "v${version}",
+    "releaseNotes": "node scripts/changelog-release-notes.mjs",
+    "web": false
+  },
+  "npm": {
+    "publish": false
+  },
+  "hooks": {
+    "before:init": "npx changeset version"
+  }
+}
