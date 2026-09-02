@@ -7,7 +7,7 @@ export interface ModelPricing {
 
 /**
  * Default USD rates per 1,000,000 tokens for the current Claude model lineup
- * (as of 2026-08). Anthropic pricing changes over time, so this table is a
+ * (as of 2026-09). Anthropic pricing changes over time, so this table is a
  * convenience default, not a guarantee — `claudeSimpleStatsBar.pricing` entries
  * override a matching model id here, and new/renamed models can be added
  * the same way.
@@ -42,6 +42,12 @@ export const DEFAULT_PRICING: Record<string, ModelPricing> = {
     outputPerMillion: 50,
     cacheWritePerMillion: 12.5,
     cacheReadPerMillion: 1,
+  },
+  "claude-fable-5-1": {
+    inputPerMillion: 10,
+    outputPerMillion: 50,
+    cacheWritePerMillion: 12.5,
+    cacheReadPerMillion: 0.25,
   },
 };
 

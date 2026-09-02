@@ -5,7 +5,7 @@
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.90.0-blue?logo=visualstudiocode)](https://code.visualstudio.com/)
 [![License: MIT](https://img.shields.io/github/license/rcanpahali/claude-simple-stats-bar)](LICENSE)
 
-Live Claude Code session stats - model, tokens, context left, cost - in the VS Code status bar.
+Claude Code has no built-in status bar for session stats - this extension fills that gap, showing model, tokens, context left, and cost live in VS Code.
 
 ![The Claude segment: total tokens, context used, and estimated cost](docs/images/statusbar-hero.png)
 
@@ -19,6 +19,10 @@ Minimal by default. Turn on `showModel` and `showSeverityTag` for the model name
 - Hover the segment for a full token breakdown and the transcript path.
 - Click the segment for a session panel listing every session in the workspace, a 7-day spend chart, and spend by model.
 - Pricing and poll interval are both configurable.
+
+## Where the data comes from
+
+There's no public API for Claude Code session telemetry. This extension reads the same `.jsonl` transcript files Claude Code already writes to disk, under `~/.claude/projects/<workspace-path-with-slashes-replaced-by-dashes>/<session-id>.jsonl`. It scans every folder in a (possibly multi-root) workspace for a matching directory and picks the most recently modified file as primary, re-parsing it on file changes plus a periodic poll as a fallback.
 
 ## Requirements
 
@@ -61,10 +65,6 @@ Click the segment, or run **Claude Simple Stats Bar: Open Session Panel**:
 | `Claude Simple Stats Bar: Refresh`                | Force a re-read of the current transcript.                             |
 | `Claude Simple Stats Bar: Open Session Panel`     | Open the webview panel (also bound to clicking the Claude segment).    |
 | `Claude Simple Stats Bar: Switch Primary Session` | Pick which concurrent session in this workspace is tracked as primary. |
-
-## Where the data comes from
-
-There's no public API for Claude Code session telemetry. This extension reads the same `.jsonl` transcript files Claude Code already writes to disk, under `~/.claude/projects/<workspace-path-with-slashes-replaced-by-dashes>/<session-id>.jsonl`. It scans every folder in a (possibly multi-root) workspace for a matching directory and picks the most recently modified file as primary, re-parsing it on file changes plus a periodic poll as a fallback.
 
 ## Cost estimates
 
