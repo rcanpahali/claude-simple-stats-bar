@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.9
+
+### Patch Changes
+
+- Add `claude-sonnet-4-6` to the built-in pricing defaults ($3/$15 per 1M input/output, $3.75 cache write, $0.30 cache read), so sessions and history entries on that model get a cost estimate instead of none. Also add `claude-sonnet-4-6` and `claude-fable-5-1` to the built-in context window defaults (1M tokens each).
+
 ## 0.4.8
 
 ### Patch Changes

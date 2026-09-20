@@ -37,6 +37,12 @@ export const DEFAULT_PRICING: Record<string, ModelPricing> = {
     cacheWritePerMillion: 1.25,
     cacheReadPerMillion: 0.1,
   },
+  "claude-sonnet-4-6": {
+    inputPerMillion: 3,
+    outputPerMillion: 15,
+    cacheWritePerMillion: 3.75,
+    cacheReadPerMillion: 0.3,
+  },
   "claude-fable-5": {
     inputPerMillion: 10,
     outputPerMillion: 50,
