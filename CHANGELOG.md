@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.10
+
+### Patch Changes
+
+- Added `claude-opus-5-5` to `DEFAULT_PRICING` ($4/$20 per MTok input/output, $5 5-minute cache write, $0.20 cache read) and to `DEFAULT_CONTEXT_WINDOW_TOKENS` (1M tokens), matching Anthropic's published rates for Claude Opus 5.5.
+
 ## 0.4.9
 
 ### Patch Changes
