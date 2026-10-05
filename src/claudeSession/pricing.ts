@@ -7,13 +7,19 @@ export interface ModelPricing {
 
 /**
  * Default USD rates per 1,000,000 tokens for the current Claude model lineup
- * (as of 2026-09). Anthropic pricing changes over time, so this table is a
+ * (as of 2026-10). Anthropic pricing changes over time, so this table is a
  * convenience default, not a guarantee — `claudeSimpleStatsBar.pricing` entries
  * override a matching model id here, and new/renamed models can be added
  * the same way.
  */
 export const DEFAULT_PRICING: Record<string, ModelPricing> = {
   "claude-sonnet-5": {
+    inputPerMillion: 2,
+    outputPerMillion: 10,
+    cacheWritePerMillion: 2.5,
+    cacheReadPerMillion: 0.2,
+  },
+  "claude-sonnet-5-5": {
     inputPerMillion: 2,
     outputPerMillion: 10,
     cacheWritePerMillion: 2.5,

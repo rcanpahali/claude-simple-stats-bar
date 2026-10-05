@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.11
+
+### Patch Changes
+
+- Added default pricing for `claude-sonnet-5-5` ($2 input / $10 output / $2.50 cache write / $0.20 cache read per million tokens), so Sonnet 5.5 sessions now show a cost estimate without a `claudeSimpleStatsBar.pricing` override.
+
 ## 0.4.10
 
 ### Patch Changes
