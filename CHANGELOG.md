@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.12
+
+### Patch Changes
+
+- Corrected the default `claude-sonnet-5-5` cache read rate from $0.20 to $0.10 per million tokens, and added default pricing for `claude-haiku-5-5` ($0.10 input / $0.50 output / $0.125 cache write / $0.01 cache read per million tokens, the rates for prompts up to 100,000 tokens).
+
 ## 0.4.11
 
 ### Patch Changes

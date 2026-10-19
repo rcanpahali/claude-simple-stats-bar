@@ -23,7 +23,7 @@ export const DEFAULT_PRICING: Record<string, ModelPricing> = {
     inputPerMillion: 2,
     outputPerMillion: 10,
     cacheWritePerMillion: 2.5,
-    cacheReadPerMillion: 0.2,
+    cacheReadPerMillion: 0.1,
   },
   "claude-opus-5": {
     inputPerMillion: 5,
@@ -36,6 +36,13 @@ export const DEFAULT_PRICING: Record<string, ModelPricing> = {
     outputPerMillion: 20,
     cacheWritePerMillion: 5,
     cacheReadPerMillion: 0.2,
+  },
+  // ponytail: Haiku 5.5 is tiered; these are the <=100k-prompt rates ($0.50/$2.50 above that)
+  "claude-haiku-5-5": {
+    inputPerMillion: 0.1,
+    outputPerMillion: 0.5,
+    cacheWritePerMillion: 0.125,
+    cacheReadPerMillion: 0.01,
   },
   "claude-haiku-4-5": {
     inputPerMillion: 1,
